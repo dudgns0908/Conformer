@@ -6,8 +6,49 @@ from conformer.activations import Swish
 class MultiHeadedSelfAttentionModule(nn.Module):
     """ Multi-Head Self Attention """
 
-    def __init__(self):
+    def __init__(
+            self,
+            dim: int,
+            num_heads: int = 8,
+            dropout_p: float = 0.1,
+            device: torch.device = 'cpu'
+    ):
         super().__init__()
+        self.device = device
+
+        self.P = 2 ** 12
+        self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
+        self.key_pos_bias = nn.Parameter(torch.zeros((self.P * 2, num_heads)), requires_grad=True)
+        self.query_pos_bias = nn.Parameter(torch.zeros((num_heads, self.d_k)), requires_grad=True)
+
+        self.sequential = nn.Sequential(
+            nn.LayerNorm(dim),
+            MultiHeadAttention(),
+            nn.Dropout(p=dropout_p)
+        )
+
+    def forward(self, inputs: Tensor) -> Tensor:
+        return self.sequential(inputs.to(self.device))
+
+
+class MultiHeadAttention(nn.Module):
+    def __init__(
+            self,
+            dim: int,
+            dropout_p: float = 0.1,
+            device: torch.device = 'cpu'
+    ):
+        super().__init__()
+        self.device = device
+
+        self.sequential = nn.Sequential(
+            nn.LayerNorm(dim),
+            MultiHeadAttention(),
+            nn.Dropout(p=dropout_p)
+        )
+
+    def forward(self, inputs: Tensor) -> Tensor:
+        return 0
 
 
 class ConvolutionModule(nn.Module):
@@ -136,6 +177,9 @@ class Transpose(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         return inputs.transpose(self.dim0, self.dim1)
+
+
+
 
 
 if __name__ == '__main__':
