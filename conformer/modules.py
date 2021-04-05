@@ -16,6 +16,8 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         super().__init__()
         self.device = device
 
+        nn.Embedding.from_pretrained(self.get_sinusoid_encoding_table(src_len+1 , d_model), freeze=True)
+
         self.P = 2 ** 12
         self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
         self.key_pos_bias = nn.Parameter(torch.zeros((self.P * 2, num_heads)), requires_grad=True)
@@ -26,6 +28,18 @@ class MultiHeadedSelfAttentionModule(nn.Module):
             MultiHeadAttention(),
             nn.Dropout(p=dropout_p)
         )
+
+    def get_sinusoid_encoding_table(self, n_position, d_model):
+        def cal_angle(position, hid_idx):
+            return position / np.power(10000, 2 * (hid_idx // 2) / d_model)
+
+        def get_posi_angle_vec(position):
+            return [cal_angle(position, hid_j) for hid_j in range(d_model)]
+
+        sinusoid_table = np.array([get_posi_angle_vec(pos_i) for pos_i in range(n_position)])
+        sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
+        sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
+        return torch.FloatTensor(sinusoid_table)
 
     def forward(self, inputs: Tensor) -> Tensor:
         return self.sequential(inputs.to(self.device))
