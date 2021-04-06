@@ -15,7 +15,7 @@ class ConformerBlock(nn.Module):
             ResidualModule(module=MultiHeadedSelfAttentionModule()),
             ResidualModule(module=ConvolutionModule()),
             ResidualModule(module=FeedForwardModule(), factor=0.5),
-            # LayerNorm()
+            nn.LayerNorm()
         )
 
 
@@ -46,5 +46,12 @@ class ConformerEncoder(nn.Module):
 
         self.to(self.device)
 
-    def forward(self, inputs: Tensor):
-        pass
+    def forward(self, inputs: Tensor) -> Tensor:
+        output = self.conv_subsampling(inputs)
+        output = self.liner(output)
+        output = self.dropout(output)
+
+        for module in self.module_list:
+            output = module(output)
+
+        return output

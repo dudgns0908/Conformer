@@ -16,7 +16,7 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         super().__init__()
         self.device = device
 
-        nn.Embedding.from_pretrained(self.get_sinusoid_encoding_table(src_len+1 , d_model), freeze=True)
+        # nn.Embedding.from_pretrained(self.get_sinusoid_encoding_table(src_len+1 , d_model), freeze=True)
 
         self.P = 2 ** 12
         self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
@@ -25,7 +25,7 @@ class MultiHeadedSelfAttentionModule(nn.Module):
 
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
-            MultiHeadAttention(),
+            MultiHeadAttentionWithRelativePositionalEmbedding(),
             nn.Dropout(p=dropout_p)
         )
 
@@ -45,7 +45,7 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         return self.sequential(inputs.to(self.device))
 
 
-class MultiHeadAttention(nn.Module):
+class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
     def __init__(
             self,
             dim: int,
@@ -57,7 +57,7 @@ class MultiHeadAttention(nn.Module):
 
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
-            MultiHeadAttention(),
+            MultiHeadAttentionWithRelativePositionalEmbedding(),
             nn.Dropout(p=dropout_p)
         )
 
