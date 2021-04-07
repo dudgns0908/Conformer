@@ -16,7 +16,7 @@ class ConformerBlock(nn.Module):
 
         self.ssequential = nn.Sequential(
             ResidualModule(module=FeedForwardModule(), factor=0.5),
-            ResidualModule(module=MultiHeadedSelfAttentionModule()),
+            ResidualModule(module=MultiHeadedSelfAttentionModule()),  # TODO:: 2. Multi Head Attention
             ResidualModule(module=ConvolutionModule()),
             ResidualModule(module=FeedForwardModule(), factor=0.5),
             nn.LayerNorm()
