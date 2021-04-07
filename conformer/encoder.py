@@ -7,7 +7,11 @@ from conformer.modules import *
 class ConformerBlock(nn.Module):
     """ Conformer Block """
 
-    def __init__(self):
+    def __init__(
+            self,
+            dim: int = 512,
+            attention_heads: int = 8,
+    ):
         super().__init__()
 
         self.ssequential = nn.Sequential(
@@ -24,25 +28,33 @@ class ConformerEncoder(nn.Module):
 
     def __init__(
             self,
-            encoder_layers: int = 17,
+            input_dim: int = 80,
             encoder_dim: int = 512,
+            num_layers: int = 17,
             attention_heads: int = 8,
             conv_kernel_size: int = 32,
             dropout_p: float = 0.1,
-            num_conformer_block: int = 10,
             device: torch.device = 'cpu'
     ):
         super().__init__()
         self.device = device
 
-        self.spec_augmentation = None  # TODO:: SpecAug 구현
-        self.conv_subsampling = nn.Conv1d(encoder_dim, encoder_dim, kernel_size=conv_kernel_size)
+        # This is an augmentation and is not necessarily implemented.
+        self.spec_augmentation = None
+
+        # TODO:: 1. complete subsampling
+        self.conv_subsampling = nn.Conv1d(1, encoder_dim, kernel_size=conv_kernel_size)
         self.liner = nn.Linear(encoder_dim, encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
-        self.module_list = nn.ModuleList()
-        for _ in range(num_conformer_block):
-            self.module_list.append(ConformerBlock())
+        # self.module_list = nn.ModuleList([ConformerBlock() for _ in range(encoder_layers)])
+        self.conformer_blocks = nn.ModuleList()
+        for _ in range(num_layers):
+            conformer_block = ConformerBlock(
+                dim=encoder_dim,
+                attention_heads=attention_heads
+            )
+            self.conformer_blocks.append(conformer_block)
 
         self.to(self.device)
 
@@ -51,7 +63,7 @@ class ConformerEncoder(nn.Module):
         output = self.liner(output)
         output = self.dropout(output)
 
-        for module in self.module_list:
-            output = module(output)
+        for conformer_block in self.conformer_blocks:
+            output = conformer_block(output)
 
         return output

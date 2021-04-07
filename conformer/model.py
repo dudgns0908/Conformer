@@ -10,13 +10,14 @@ class Conformer(nn.Module):
 
     def __init__(
             self,
-            encoder_layers: int = 17,
+            input_dim: int = 80,
             encoder_dim: int = 512,
+            num_encoder_layers: int = 17,
             attention_heads: int = 8,
             conv_kernel_size: int = 31,
             dropout_p: float = 0.1,
-            decoder_layers: int = 1,
             decoder_dim: int = 640,
+            num_decoder_layers: int = 1,
             device: torch.device = 'cpu'
     ):
         super().__init__()
@@ -25,12 +26,12 @@ class Conformer(nn.Module):
         # Encoder
         self.encoder_dim = encoder_dim
         self.encoder = ConformerEncoder(
-            encoder_layers=encoder_layers,
+            input_dim=input_dim,
             encoder_dim=encoder_dim,
+            num_layers=num_encoder_layers,
             attention_heads=attention_heads,
             conv_kernel_size=conv_kernel_size,
             dropout_p=dropout_p,
-            num_conformer_block=10
         ).to(self.device)
 
         # Decoder
