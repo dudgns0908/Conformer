@@ -1,5 +1,22 @@
+import numpy as np
 import torch
 from torch import nn, Tensor
+import torch.nn.functional as F
+
+
+class ScaledDotProductAttention(nn.Module):
+    """ Scaled Dot-Product Attention """
+
+    def __init__(self, dim: int = 8):
+        super(ScaledDotProductAttention, self).__init__()
+        self.dim = np.sqrt(dim)
+
+    def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
+        scaled_matmul = torch.bmm(query, torch.transpose(key, 1, 2)) / self.dim
+        softmax = F.softmax(scaled_matmul)
+        attention = torch.bmm(softmax, value)
+
+        return attention
 
 
 class MultiHeadAttention(nn.Module):
@@ -13,8 +30,32 @@ class MultiHeadAttention(nn.Module):
     ):
         super().__init__()
 
-    def forward(self, query: Tensor, key: Tensor, value: Tensor) -> None:
-        pass
+        self.num_heads = num_heads
+        self.dk = dim // num_heads
+
+        self.query = nn.Linear(dim, dim * self.dk)
+        self.key = nn.Linear(dim, dim * self.dk)
+        self.value = nn.Linear(dim, dim * self.dk)
+        self.scaled_dot_product_attention = ScaledDotProductAttention(self.dk)
+
+    def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
+        batch_size = query.shape[0]
+
+        query_output = self.query(query).view(batch_size, self.num_heads, self.dk)
+        key_output = self.key(key).view(batch_size, self.num_heads, self.dk)
+        value_output = self.value(value).view(batch_size, self.num_heads, self.dk)
+
+        attention_output = self.scaled_dot_product_attention(query_output, key_output, value_output)
+        # return attention_output
+
+
+class PositionalEmbedding(nn.Module):
+    """ Relative Positional Embedding """
+
+    def __init__(
+            self
+    ) -> None:
+        super().__init__()
 
 
 class PointwiseConv1d(nn.Module):

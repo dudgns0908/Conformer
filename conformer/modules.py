@@ -19,10 +19,10 @@ class MultiHeadedSelfAttentionModule(nn.Module):
 
         # nn.Embedding.from_pretrained(self.get_sinusoid_encoding_table(src_len+1 , d_model), freeze=True)
 
-        self.P = 2 ** 12
-        self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
-        self.key_pos_bias = nn.Parameter(torch.zeros((self.P * 2, num_heads)), requires_grad=True)
-        self.query_pos_bias = nn.Parameter(torch.zeros((num_heads, self.d_k)), requires_grad=True)
+        # self.P = 2 ** 12
+        # self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
+        # self.key_pos_bias = nn.Parameter(torch.zeros((self.P * 2, num_heads)), requires_grad=True)
+        # self.query_pos_bias = nn.Parameter(torch.zeros((num_heads, self.d_k)), requires_grad=True)
 
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
@@ -56,14 +56,8 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         super().__init__()
         self.device = device
 
-        self.sequential = nn.Sequential(
-            nn.LayerNorm(dim),
-            MultiHeadAttentionWithRelativePositionalEmbedding(),
-            nn.Dropout(p=dropout_p)
-        )
-
     def forward(self, inputs: Tensor) -> Tensor:
-        return 0
+        return Tensor([1])
 
 
 class ConvolutionModule(nn.Module):
