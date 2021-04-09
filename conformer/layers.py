@@ -8,7 +8,7 @@ class ScaledDotProductAttention(nn.Module):
     """ Scaled Dot-Product Attention """
 
     def __init__(self, dim: int = 8):
-        super(ScaledDotProductAttention, self).__init__()
+        super().__init__()
         self.dim = np.sqrt(dim)
 
     def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
@@ -33,17 +33,17 @@ class MultiHeadAttention(nn.Module):
         self.num_heads = num_heads
         self.dk = dim // num_heads
 
-        self.query = nn.Linear(dim, dim * self.dk)
-        self.key = nn.Linear(dim, dim * self.dk)
-        self.value = nn.Linear(dim, dim * self.dk)
+        self.query_projection = nn.Linear(dim, dim * self.dk)
+        self.key_projection = nn.Linear(dim, dim * self.dk)
+        self.value_projection = nn.Linear(dim, dim * self.dk)
         self.scaled_dot_product_attention = ScaledDotProductAttention(self.dk)
 
     def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
         batch_size = query.shape[0]
 
-        query_output = self.query(query).view(batch_size, self.num_heads, self.dk)
-        key_output = self.key(key).view(batch_size, self.num_heads, self.dk)
-        value_output = self.value(value).view(batch_size, self.num_heads, self.dk)
+        query_output = self.query_projection(query).view(batch_size, self.num_heads, self.dk)
+        key_output = self.key_projection(key).view(batch_size, self.num_heads, self.dk)
+        value_output = self.value_projection(value).view(batch_size, self.num_heads, self.dk)
 
         attention_output = self.scaled_dot_product_attention(query_output, key_output, value_output)
         # return attention_output
@@ -53,9 +53,22 @@ class PositionalEmbedding(nn.Module):
     """ Relative Positional Embedding """
 
     def __init__(
-            self
+            self,
+            d_model: int,
+            max_len: int = 5000,
     ) -> None:
         super().__init__()
+
+        pe = torch.zeros(max_len, d_model, requires_grad=False)
+        pos = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(np.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(pos * div_term)
+        pe[:, 1::2] = torch.cos(pos * div_term)
+        pe = self.pe.unsqueeze(0)
+        self.register_buffer('pe', pe)
+
+    def forward(self, length: int) -> Tensor:
+        return self.pe[:, :length]
 
 
 class PointwiseConv1d(nn.Module):
