@@ -1,11 +1,12 @@
 import torch
 from torch import nn, Tensor
 from conformer.activations import Swish
-from conformer.layers import Transpose, PointwiseConv1d, DepthwiseConv1d
+from conformer.layers import Transpose, PointwiseConv1d, DepthwiseConv1d, \
+    MultiHeadAttentionWithRelativePositionalEmbedding
 
 
 class MultiHeadedSelfAttentionModule(nn.Module):
-    """ Multi-Head Self Attention """
+    """ Multi-Head Self Attention Module """
 
     def __init__(
             self,
@@ -17,16 +18,9 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         super().__init__()
         self.device = device
 
-        # nn.Embedding.from_pretrained(self.get_sinusoid_encoding_table(src_len+1 , d_model), freeze=True)
-
-        # self.P = 2 ** 12
-        # self.key_pos_embeddings = nn.Parameter(torch.zeros((self.P * 2, num_heads, self.d_k)), requires_grad=True)
-        # self.key_pos_bias = nn.Parameter(torch.zeros((self.P * 2, num_heads)), requires_grad=True)
-        # self.query_pos_bias = nn.Parameter(torch.zeros((num_heads, self.d_k)), requires_grad=True)
-
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
-            MultiHeadAttentionWithRelativePositionalEmbedding(),
+            MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
             nn.Dropout(p=dropout_p)
         )
 
@@ -44,20 +38,6 @@ class MultiHeadedSelfAttentionModule(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         return self.sequential(inputs.to(self.device))
-
-
-class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
-    def __init__(
-            self,
-            dim: int,
-            dropout_p: float = 0.1,
-            device: torch.device = 'cpu'
-    ):
-        super().__init__()
-        self.device = device
-
-    def forward(self, inputs: Tensor) -> Tensor:
-        return Tensor([1])
 
 
 class ConvolutionModule(nn.Module):
@@ -133,9 +113,6 @@ class ResidualModule(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         module_output = self.module(inputs) * self.factor
         return module_output + inputs
-
-
-
 
 
 if __name__ == '__main__':

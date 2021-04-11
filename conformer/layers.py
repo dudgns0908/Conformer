@@ -74,6 +74,21 @@ class PositionalEmbedding(nn.Module):
         return self.pe[:, :length]
 
 
+class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
+    """ Multi-Head Attention with Relative Positional Embedding """
+
+    def __init__(
+            self,
+            dim: int = 512,
+            num_heads: int = 16,
+            dropout_p: float = 0.1,
+    ):
+        super().__init__()
+
+    def forward(self, inputs: Tensor) -> Tensor:
+        return Tensor([1])
+
+
 class PointwiseConv1d(nn.Module):
     def __init__(
             self,
