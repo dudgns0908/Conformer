@@ -26,7 +26,6 @@ class MultiHeadAttention(nn.Module):
             self,
             dim: int = 512,
             num_heads: int = 8,
-            dropout_p: float = 0.1,
     ):
         super().__init__()
 
