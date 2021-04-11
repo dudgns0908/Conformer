@@ -30,23 +30,32 @@ class MultiHeadAttention(nn.Module):
     ):
         super().__init__()
 
+        self.dim = dim
         self.num_heads = num_heads
         self.dk = dim // num_heads
 
         self.query_projection = nn.Linear(dim, dim * self.dk)
         self.key_projection = nn.Linear(dim, dim * self.dk)
         self.value_projection = nn.Linear(dim, dim * self.dk)
-        self.scaled_dot_product_attention = ScaledDotProductAttention(self.dk)
+        self.scaled_dot_product_attention = ScaledDotProductAttention(dim=self.dk)
+        self.linear = nn.Linear(self.dim, self.dim)
 
     def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
         batch_size = query.shape[0]
 
-        query_output = self.query_projection(query).view(batch_size, self.num_heads, self.dk)
-        key_output = self.key_projection(key).view(batch_size, self.num_heads, self.dk)
-        value_output = self.value_projection(value).view(batch_size, self.num_heads, self.dk)
+        query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.dk)
+        key = self.key_projection(key).view(batch_size, -1, self.num_heads, self.dk)
+        value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.dk)
 
-        attention_output = self.scaled_dot_product_attention(query_output, key_output, value_output)
-        # return attention_output
+        query = query.transpose(1, 2).contiguous()
+        key = key.transpose(1, 2).contiguous()
+        value = value.transpose(1, 2).contiguous()
+
+        attention = self.scaled_dot_product_attention(query, key, value)
+        concat = attention.transpose(1, 2).contiguous().view(batch_size, -1, self.dim)
+        linear = self.linear(concat)
+
+        return linear
 
 
 class PositionalEmbedding(nn.Module):
