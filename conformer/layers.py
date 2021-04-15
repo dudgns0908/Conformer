@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import torch
 from torch import nn, Tensor
@@ -52,40 +54,43 @@ class MultiHeadAttention(nn.Module):
         return linear
 
 
-class PositionalEmbedding(nn.Module):
-    """ Relative Positional Embedding """
-
-    def __init__(
-            self,
-            d_model: int,
-            max_len: int = 5000,
-    ) -> None:
-        super().__init__()
-
-        pe = torch.zeros(max_len, d_model, requires_grad=False)
-        pos = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(np.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(pos * div_term)
-        pe[:, 1::2] = torch.cos(pos * div_term)
-        pe = self.pe.unsqueeze(0)
-        self.register_buffer('pe', pe)
-
-    def forward(self, length: int) -> Tensor:
-        return self.pe[:, :length]
-
-
 class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
     """ Multi-Head Attention with Relative Positional Embedding """
 
     def __init__(
             self,
-            dim: int = 512,
+            d_model: int = 512,
             num_heads: int = 16,
             dropout_p: float = 0.1,
     ):
         super().__init__()
 
-    def forward(self, inputs: Tensor) -> Tensor:
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_head = d_model // num_heads
+
+        self.sqrt_dim = np.sqrt(d_model)
+
+        self.query_projection = nn.Linear(d_model, d_model)
+        self.key_projection = nn.Linear(d_model, d_model)
+        self.value_projection = nn.Linear(d_model, d_model)
+        self.pos_projection = nn.Linear(d_model, d_model, bias=False)
+
+        self.dropout = nn.Dropout(p=dropout_p)
+        self.u_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
+        self.v_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
+        torch.nn.init.xavier_uniform_(self.u_bias)
+        torch.nn.init.xavier_uniform_(self.v_bias)
+
+        self.out_projection = nn.Linear(d_model, d_model)
+
+    def forward(
+            self,
+            query: Tensor,
+            key: Tensor,
+            value: Tensor,
+            mask: Optional[Tensor]
+    ) -> Tensor:
         return Tensor([1])
 
 
