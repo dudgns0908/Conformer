@@ -1,8 +1,8 @@
 import torch
 from torch import nn, Tensor
 from conformer.activations import Swish
-from conformer.layers import Transpose, PointwiseConv1d, DepthwiseConv1d, \
-    MultiHeadAttentionWithRelativePositionalEmbedding
+from conformer.attention import RelativeMultiHeadAttention
+from conformer.convolutions import PointwiseConv1d, DepthwiseConv1d
 
 
 class MultiHeadedSelfAttentionModule(nn.Module):
@@ -20,21 +20,9 @@ class MultiHeadedSelfAttentionModule(nn.Module):
 
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
-            MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
+            RelativeMultiHeadAttention(dim, num_heads),
             nn.Dropout(p=dropout_p)
         )
-
-    def get_sinusoid_encoding_table(self, n_position, d_model):
-        def cal_angle(position, hid_idx):
-            return position / np.power(10000, 2 * (hid_idx // 2) / d_model)
-
-        def get_posi_angle_vec(position):
-            return [cal_angle(position, hid_j) for hid_j in range(d_model)]
-
-        sinusoid_table = np.array([get_posi_angle_vec(pos_i) for pos_i in range(n_position)])
-        sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
-        sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
-        return torch.FloatTensor(sinusoid_table)
 
     def forward(self, inputs: Tensor) -> Tensor:
         return self.sequential(inputs.to(self.device))
@@ -115,33 +103,15 @@ class ResidualModule(nn.Module):
         return module_output + inputs
 
 
-if __name__ == '__main__':
-    import numpy as np
+class Transpose(nn.Module):
+    def __init__(
+            self,
+            dim0: int = 0,
+            dim1: int = 1,
+    ):
+        super().__init__()
+        self.dim0 = dim0
+        self.dim1 = dim1
 
-    module = ConvolutionModule(in_channels=2)
-    data = np.asarray([
-        [
-            [1, 2],
-            [2, 3],
-            [2, 3]
-        ],
-        [
-            [1, 2],
-            [2, 3],
-            [2, 3]
-        ],
-
-    ])
-
-    # data = np.asarray([
-    #     [[1, 2],
-    #      [4, 5],
-    #      [4, 5]],
-    #
-    #     [[1, 2],
-    #      [4, 5],
-    #      [4, 5]]
-    # ])
-
-    output = module(torch.from_numpy(data).float())
-    print(output)
+    def forward(self, inputs: Tensor) -> Tensor:
+        return inputs.transpose(self.dim0, self.dim1)

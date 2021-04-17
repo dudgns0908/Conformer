@@ -44,7 +44,8 @@ class ConformerEncoder(nn.Module):
             input_dim: int = 80,
             encoder_dim: int = 512,
             num_layers: int = 17,
-            attention_heads: int = 8,
+            num_attention_heads: int = 8,
+            conv_expansion_factor: int = 2,
             conv_kernel_size: int = 32,
             dropout_p: float = 0.1,
             device: torch.device = 'cpu'
@@ -65,7 +66,9 @@ class ConformerEncoder(nn.Module):
         for _ in range(num_layers):
             conformer_block = ConformerBlock(
                 dim=encoder_dim,
-                attention_heads=attention_heads
+                num_attention_heads=num_attention_heads,
+                conv_expansion_factor=conv_expansion_factor,
+                conv_kernel_size=conv_kernel_size,
             )
             self.conformer_blocks.append(conformer_block)
 
