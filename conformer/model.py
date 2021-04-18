@@ -13,11 +13,16 @@ class Conformer(nn.Module):
             input_dim: int = 80,
             encoder_dim: int = 512,
             num_encoder_layers: int = 17,
-            attention_heads: int = 8,
+            num_attention_heads: int = 8,
             conv_kernel_size: int = 31,
             dropout_p: float = 0.1,
+
+            # Decoder
+            decoder_name: str = None,
             decoder_dim: int = 640,
             num_decoder_layers: int = 1,
+
+            # Device
             device: torch.device = 'cpu'
     ):
         super().__init__()
@@ -29,7 +34,7 @@ class Conformer(nn.Module):
             input_dim=input_dim,
             encoder_dim=encoder_dim,
             num_layers=num_encoder_layers,
-            attention_heads=attention_heads,
+            num_attention_heads=num_attention_heads,
             conv_kernel_size=conv_kernel_size,
             dropout_p=dropout_p,
         ).to(self.device)

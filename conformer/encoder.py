@@ -1,3 +1,4 @@
+from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling
 from torch import nn, Tensor
 from torch.nn import LayerNorm
 
@@ -57,7 +58,7 @@ class ConformerEncoder(nn.Module):
         self.spec_augmentation = None
 
         # TODO:: 1. complete subsampling
-        self.conv_subsampling = nn.Conv1d(1, encoder_dim, kernel_size=conv_kernel_size)
+        self.conv_subsampling = Conv2dSubsampling(input_dim, encoder_dim)
         self.liner = nn.Linear(encoder_dim, encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
