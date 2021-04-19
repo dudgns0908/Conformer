@@ -1,8 +1,10 @@
+__all__ = ['Conformer']
+
 import torch
 from torch import nn, Tensor
 from torch.optim import Adam
 
-from conformer.encoder import ConformerEncoder
+from conformer.models.encoder import ConformerEncoder
 
 
 class Conformer(nn.Module):
