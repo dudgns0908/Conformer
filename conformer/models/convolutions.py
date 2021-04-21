@@ -47,12 +47,13 @@ class DepthwiseConv1d(nn.Module):
 class Conv2dSubsampling(nn.Module):
     """ Conv2dSubsampling """
 
-    def __ceil__(
+    def __init__(
             self,
             in_channels: int,
             out_channels: int,
             activation: nn.Module = nn.ReLU
     ) -> None:
+        super().__init__()
         self.conv = nn.Sequential(
             torch.nn.Conv2d(in_channels, out_channels, 3, 2),
             activation(),

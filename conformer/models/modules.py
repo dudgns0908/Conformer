@@ -1,8 +1,8 @@
 import torch
 from torch import nn, Tensor
-from conformer.activations import Swish
-from conformer.attention import RelativeMultiHeadAttention
-from conformer.convolutions import PointwiseConv1d, DepthwiseConv1d
+from conformer.models.activations import Swish
+from conformer.models.attention import RelativeMultiHeadAttention
+from conformer.models.convolutions import PointwiseConv1d, DepthwiseConv1d
 
 
 class MultiHeadedSelfAttentionModule(nn.Module):

@@ -1,8 +1,10 @@
-from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling
+import torch
 from torch import nn, Tensor
 from torch.nn import LayerNorm
 
-from conformer.modules import *
+from conformer.models.modules import *
+from conformer.models.convolutions import Conv2dSubsampling
+
 
 
 class ConformerBlock(nn.Module):
