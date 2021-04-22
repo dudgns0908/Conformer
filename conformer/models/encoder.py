@@ -60,7 +60,7 @@ class ConformerEncoder(nn.Module):
         self.spec_augmentation = None
 
         # TODO:: 1. complete subsampling
-        self.conv_subsampling = Conv2dSubsampling(input_dim, encoder_dim)
+        self.conv_subsampling = Conv2dSubsampling(1, encoder_dim)
         self.liner = nn.Linear(encoder_dim, encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
