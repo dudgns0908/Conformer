@@ -11,7 +11,7 @@ def load_audio(path: str, sampling_rate: int = 16000):
         elif extension == 'pcm':
             signal = np.memmap(path, dtype='h', mode='r').astype('float32')
         else:
-            raise ValueError(f'This extention({extension}) is Not Support')
+            raise ValueError(f'This extension ({extension}) is not supported')
 
     except FileNotFoundError as e:
         raise e
