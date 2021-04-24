@@ -1,5 +1,6 @@
 import hydra
 from omegaconf import DictConfig, OmegaConf
+from conformer.utils import logger
 
 
 @hydra.main(config_path='./config', config_name="config")
