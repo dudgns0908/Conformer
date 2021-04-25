@@ -6,23 +6,7 @@ from torch import nn, Tensor
 import torch.nn.functional as F
 
 
-class RelativeMultiHeadAttention(nn.Module):
-    """
-    Multi-head attention with relative positional encoding.
-    This concept was proposed in the "Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context"
-    Args:
-        dim (int): The dimension of model
-        num_heads (int): The number of attention heads.
-        dropout_p (float): probability of dropout
-    Inputs: query, key, value, pos_embedding, mask
-        - **query** (batch, time, dim): Tensor containing query vector
-        - **key** (batch, time, dim): Tensor containing key vector
-        - **value** (batch, time, dim): Tensor containing value vector
-        - **pos_embedding** (batch, time, dim): Positional embedding tensor
-        - **mask** (batch, 1, time2) or (batch, time1, time2): Tensor containing indices to be masked
-    Returns:
-        - **outputs**: Tensor produces by relative multi head attention module.
-    """
+class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
 
     def __init__(
             self,
@@ -30,7 +14,7 @@ class RelativeMultiHeadAttention(nn.Module):
             num_heads: int = 16,
             dropout_p: float = 0.1,
     ) -> None:
-        super(RelativeMultiHeadAttention, self).__init__()
+        super().__init__()
         assert dim % num_heads == 0, "d_model % num_heads should be zero."
 
         self.dim = dim

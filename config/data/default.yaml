@@ -1,0 +1,2 @@
+# @package data
+audio_path: ../dataset/*.pcm

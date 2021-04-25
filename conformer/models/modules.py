@@ -1,7 +1,7 @@
 import torch
 from torch import nn, Tensor
 from conformer.models.activations import Swish
-from conformer.models.attention import RelativeMultiHeadAttention
+from conformer.models.attention import MultiHeadAttentionWithRelativePositionalEmbedding
 from conformer.models.convolutions import PointwiseConv1d, DepthwiseConv1d
 
 
@@ -20,7 +20,7 @@ class MultiHeadedSelfAttentionModule(nn.Module):
 
         self.sequential = nn.Sequential(
             nn.LayerNorm(dim),
-            RelativeMultiHeadAttention(dim, num_heads),
+            MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
             nn.Dropout(p=dropout_p)
         )
 

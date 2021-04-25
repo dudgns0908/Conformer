@@ -1,11 +1,22 @@
+import logging
+from dataclasses import dataclass
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
-from conformer.utils import logger
+
+#
+# @dataclass
+# class TestConfig:
+#     phase: str = 'train'
 
 
-@hydra.main(config_path='./config', config_name="config")
+log = logging.getLogger(__name__)
+
+
+@hydra.main(config_path='./config', config_name='config')
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
+    print(cfg)
 
 
 if __name__ == '__main__':
