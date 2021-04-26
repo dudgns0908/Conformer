@@ -61,7 +61,7 @@ class ConformerEncoder(nn.Module):
 
         # TODO:: 1. complete subsampling
         self.conv_subsampling = Conv2dSubsampling(1, encoder_dim)
-        self.liner = nn.Linear(encoder_dim, encoder_dim)
+        self.liner = nn.Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
         # self.module_list = nn.ModuleList([ConformerBlock() for _ in range(encoder_layers)])

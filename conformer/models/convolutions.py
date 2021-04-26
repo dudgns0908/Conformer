@@ -64,6 +64,6 @@ class Conv2dSubsampling(nn.Module):
     def forward(self, inputs: Tensor) -> Tensor:
         outputs = self.conv(inputs.unsqueeze(1))
 
-        batch_size, channels, dimension, seq_lengths = outputs.size()
-        outputs = outputs.permute(0, 3, 1, 2).contiguous().view(batch_size, seq_lengths, channels * dimension)
+        batch_size, channels, seq_lengths, dimension = outputs.size()
+        outputs = outputs.permute(0, 2, 1, 3).contiguous().view(batch_size, seq_lengths, channels * dimension)
         return outputs
