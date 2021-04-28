@@ -18,14 +18,16 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         super().__init__()
         self.device = device
 
-        self.sequential = nn.Sequential(
-            nn.LayerNorm(dim),
-            MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
-            nn.Dropout(p=dropout_p)
-        )
+        self.layer_norm = nn.LayerNorm(dim)
+        self.attention = MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
+        self.dropout = nn.Dropout(p=dropout_p)
 
     def forward(self, inputs: Tensor) -> Tensor:
-        return self.sequential(inputs.to(self.device))
+        norm_val = self.layer_norm(inputs)
+        # TOTO:: Add Positional Embedding
+        attention = self.attention(norm_val, norm_val, norm_val)
+        output = self.dropout(attention)
+        return output
 
 
 class ConvolutionModule(nn.Module):

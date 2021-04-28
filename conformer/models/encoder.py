@@ -6,7 +6,6 @@ from conformer.models.modules import *
 from conformer.models.convolutions import Conv2dSubsampling
 
 
-
 class ConformerBlock(nn.Module):
     """ Conformer Block """
 
@@ -19,7 +18,7 @@ class ConformerBlock(nn.Module):
     ):
         super().__init__()
 
-        self.ssequential = nn.Sequential(
+        self.sequential = nn.Sequential(
             ResidualModule(module=FeedForwardModule(dim), factor=0.5),
 
             # TODO:: 2. Multi Head Attention
@@ -37,6 +36,9 @@ class ConformerBlock(nn.Module):
             ResidualModule(module=FeedForwardModule(dim), factor=0.5),
             nn.LayerNorm(dim)
         )
+
+    def forward(self, inputs: Tensor) -> Tensor:
+        return self.sequential(inputs)
 
 
 class ConformerEncoder(nn.Module):
@@ -59,7 +61,6 @@ class ConformerEncoder(nn.Module):
         # This is an augmentation and is not necessarily implemented.
         self.spec_augmentation = None
 
-        # TODO:: 1. complete subsampling
         self.conv_subsampling = Conv2dSubsampling(1, encoder_dim)
         self.liner = nn.Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
