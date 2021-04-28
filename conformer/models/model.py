@@ -45,8 +45,7 @@ class Conformer(nn.Module):
         self.decoder = None
 
     def forward(self, inputs: Tensor) -> Tensor:
-        encoder_val = self.encoder(inputs)
-        return Tensor([])
+        return self.encoder(inputs)
 
     def fit(self, inputs: Tensor, labels: Tensor) -> None:
         lr = 0.05 / (self.encoder_dim ** 0.5)

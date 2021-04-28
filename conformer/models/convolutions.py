@@ -37,8 +37,16 @@ class DepthwiseConv1d(nn.Module):
             bias: bool = True,
     ):
         super().__init__()
-        self.depthwise = nn.Conv1d(in_channels, in_channels * kernels_per_layer, kernel_size, stride=stride, padding=padding,
-                                   dilation=dilation, groups=in_channels, bias=bias)
+        self.depthwise = nn.Conv1d(
+            in_channels=in_channels,
+            out_channels=in_channels * kernels_per_layer,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            groups=in_channels,
+            bias=bias
+        )
 
     def forward(self, x):
         return self.depthwise(x)

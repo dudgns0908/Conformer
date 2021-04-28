@@ -11,7 +11,7 @@ class PositionalEmbedding(nn.Module):
     def __init__(
             self,
             d_model: int = 512,
-            max_len: int = 5000,
+            max_len: int = 10000,
     ) -> None:
         super().__init__()
 
@@ -20,7 +20,7 @@ class PositionalEmbedding(nn.Module):
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(pos * div_term)
         pe[:, 1::2] = torch.cos(pos * div_term)
-        pe = self.pe.unsqueeze(0)
+        pe = pe.unsqueeze(0)
         self.register_buffer('pe', pe)
 
     def forward(self, length: int) -> Tensor:

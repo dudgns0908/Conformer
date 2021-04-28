@@ -19,12 +19,12 @@ class MultiHeadedSelfAttentionModule(nn.Module):
         self.device = device
 
         self.layer_norm = nn.LayerNorm(dim)
-        self.attention = MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads),
+        self.attention = MultiHeadAttentionWithRelativePositionalEmbedding(dim, num_heads)
         self.dropout = nn.Dropout(p=dropout_p)
 
     def forward(self, inputs: Tensor) -> Tensor:
         norm_val = self.layer_norm(inputs)
-        # TOTO:: Add Positional Embedding
+        # TODO:: Add Positional Embedding
         attention = self.attention(norm_val, norm_val, norm_val)
         output = self.dropout(attention)
         return output
@@ -53,7 +53,7 @@ class ConvolutionModule(nn.Module):
             Transpose(1, 2),
             PointwiseConv1d(in_channels, first_channels),
             nn.GLU(dim=1),
-            DepthwiseConv1d(second_channels, second_channels, kernel_size, stride=1, padding=(kernel_size - 1) // 2),
+            DepthwiseConv1d(second_channels, kernel_size=kernel_size, stride=1, padding=(kernel_size - 1) // 2),
             nn.BatchNorm1d(second_channels),
             Swish(),
             PointwiseConv1d(second_channels, in_channels),

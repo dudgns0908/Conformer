@@ -5,6 +5,8 @@ import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
 
+from conformer.models.embedding import PositionalEmbedding
+
 
 class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
 
@@ -22,6 +24,7 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         self.num_heads = num_heads
         self.sqrt_dim = np.sqrt(dim)
 
+        self.positional_embedding = PositionalEmbedding(d_model=dim)
         self.query_proj = nn.Linear(dim, dim)
         self.key_proj = nn.Linear(dim, dim)
         self.value_proj = nn.Linear(dim, dim)
@@ -40,10 +43,13 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
             query: Tensor,
             key: Tensor,
             value: Tensor,
-            pos_embedding: Tensor,
+            # pos_embedding: Tensor,
             mask: Optional[Tensor] = None,
     ) -> Tensor:
-        batch_size = value.size(0)
+        batch_size, seq_length, _ = value.size()
+
+        # Positional embedding
+        pos_embedding = self.positional_embedding(seq_length)
 
         query = self.query_proj(query).view(batch_size, -1, self.num_heads, self.d_head)
         key = self.key_proj(key).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
