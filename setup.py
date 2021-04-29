@@ -6,7 +6,7 @@ setup(
     packages=['conformer'],
     url='https://github.com/dudgns0908/Conformer',
     license='Apache-2.0 License',
-    author='younghun',
+    author='Younghun Kim',
     author_email='dudgns09081@gmail.com',
     description=''
 )
