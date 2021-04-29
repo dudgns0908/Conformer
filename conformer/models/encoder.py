@@ -65,7 +65,6 @@ class ConformerEncoder(nn.Module):
         self.liner = nn.Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
-        # self.module_list = nn.ModuleList([ConformerBlock() for _ in range(encoder_layers)])
         self.conformer_blocks = nn.ModuleList()
         for _ in range(num_layers):
             conformer_block = ConformerBlock(
