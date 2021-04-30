@@ -6,6 +6,8 @@ PyTorch Implementation: [Convolution-augmented Transformer for Speech Recognitio
 
 
 # Introduction
+This is an ASR model called Conformer made by Google.
+
 ### Conformer Architecture
 ![Conformer Encoder Architecture](docs/images/encoder_block.png)
 
