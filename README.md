@@ -5,7 +5,7 @@ PyTorch Implementation: [Convolution-augmented Transformer for Speech Recognitio
 [![Framework](https://img.shields.io/badge/Framework-PyTorch-red.svg)](https://pytorch.org/)
 
 
-## Introduction
+# Introduction
 This is an ASR model called **Conformer** made by Google. <br />
 This paper introduces only encoder models. However, I implemented both encoder and decoder model using PyTorch.
 
@@ -15,6 +15,6 @@ Encoder was implemented as conformer according to the paper, and decoder was imp
 ![Conformer Encoder Architecture](docs/images/encoder_block.png)
 
 
-## Installation
+# Installation
 
-## Usage
+# Usage
