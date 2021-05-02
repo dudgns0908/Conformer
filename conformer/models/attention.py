@@ -9,7 +9,7 @@ from conformer.models.embedding import PositionalEmbedding
 
 
 class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
-
+    # TODO:: Read paper that 'transformer XL' and understand it.
     def __init__(
             self,
             dim: int = 512,
