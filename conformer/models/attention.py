@@ -51,6 +51,7 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         # Positional embedding
         pos_embedding = self.positional_embedding(seq_length)
 
+        # TODO:: need to understand...
         query = self.query_proj(query).view(batch_size, -1, self.num_heads, self.d_head)
         key = self.key_proj(key).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
         value = self.value_proj(value).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
