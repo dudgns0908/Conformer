@@ -12,8 +12,12 @@ This paper introduces only encoder models. However, I implemented both encoder a
 Encoder was implemented as conformer according to the paper, and decoder was implemented as 'LSTM'.
 
 ### Conformer Architecture
-![Conformer Encoder Architecture](docs/images/encoder_block.png)
+![Conformer Encoder Architecture](docs/images/encoder_block.png) <br />
+description
 
+### Feed Forward Module
+![Feed Forward Module](docs/images/feed_forward_module.png) <br />
+description
 
 # Installation
 

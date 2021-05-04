@@ -67,7 +67,7 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
             mask = mask.unsqueeze(1)
             score.masked_fill_(mask, -1e9)
 
-        attn = F.softmax(score, -1)
+        attn = F.softmax(score, -1) 
         attn = self.dropout(attn)
 
         context = torch.matmul(attn, value).transpose(1, 2)
