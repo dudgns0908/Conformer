@@ -19,6 +19,13 @@ description
 ![Feed Forward Module](docs/images/feed_forward_module.png) <br />
 description
 
+### Multi-Head Self Attention Module
+![Multi-Head Self Attention Module](docs/images/multi_head_self_attention_module.png) <br />
+description
+
+### Convolution Module
+![Convolution Module](docs/images/convolution_module.png) <br />
+description
 # Installation
 
 # Usage
