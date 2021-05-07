@@ -30,3 +30,10 @@ description
 # Installation
 
 # Usage
+
+### Train
+```python
+from conformer.trainer import Trainer
+Trainer().fit()
+
+```
