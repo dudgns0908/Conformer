@@ -6,7 +6,7 @@ from torch import nn, Tensor
 
 
 class PositionalEmbedding(nn.Module):
-    """ Relative Positional Embedding """
+    """ Positional Embedding """
 
     def __init__(
             self,
@@ -25,3 +25,10 @@ class PositionalEmbedding(nn.Module):
 
     def forward(self, length: int) -> Tensor:
         return self.pe[:, :length]
+
+
+class RelativePositionalEncoding(nn.Module):
+    """ Relative Positional Encoding """
+
+    def __init__(self):
+        super(RelativePositionalEncoding, self).__init__()
