@@ -23,11 +23,12 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         self.d_head = int(dim / num_heads)
         self.num_heads = num_heads
         self.sqrt_dim = np.sqrt(dim)
+        self.dk = dim // num_heads
 
-        # self.positional_embedding = PositionalEmbedding(d_model=dim)
-        # self.query_proj = nn.Linear(dim, dim)
-        # self.key_proj = nn.Linear(dim, dim)
-        # self.value_proj = nn.Linear(dim, dim)
+        self.positional_embedding = PositionalEmbedding(d_model=dim)
+        self.query_projection = nn.Linear(dim, dim)
+        self.key_projection = nn.Linear(dim, dim)
+        self.value_projection = nn.Linear(dim, dim)
         # self.pos_proj = nn.Linear(dim, dim, bias=False)
         #
         # self.dropout = nn.Dropout(p=dropout_p)
@@ -52,12 +53,12 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         pos_embedding = self.positional_embedding(seq_length)
 
         # TODO:: need to understand...
-        # query = self.query_proj(query).view(batch_size, -1, self.num_heads, self.d_head)
-        # key = self.key_proj(key).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
-        # value = self.value_proj(value).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
+        query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.d_head)
+        key = self.key_projection(key).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
+        value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
         # pos_embedding = self.pos_proj(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
-        #
-        # content_score = torch.matmul((query + self.u_bias).transpose(1, 2), key.transpose(2, 3))
+
+        content_score = torch.matmul((query + self.u_bias).transpose(1, 2), key.transpose(2, 3))
         # pos_score = torch.matmul((query + self.v_bias).transpose(1, 2), pos_embedding.permute(0, 2, 3, 1))
         # pos_score = self._relative_shift(pos_score)
         #
