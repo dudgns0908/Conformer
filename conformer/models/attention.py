@@ -5,7 +5,7 @@ import torch
 from torch import nn, Tensor
 import torch.nn.functional as F
 
-from conformer.models.embedding import PositionalEmbedding
+from conformer.models.embedding import PositionalEncoding
 
 
 class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
@@ -20,24 +20,24 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         assert dim % num_heads == 0, "d_model % num_heads should be zero."
 
         self.dim = dim
-        self.d_head = int(dim / num_heads)
+        self.d_head = dim // num_heads
         self.num_heads = num_heads
         self.sqrt_dim = np.sqrt(dim)
-        self.dk = dim // num_heads
 
-        self.positional_embedding = PositionalEmbedding(d_model=dim)
+        self.positional_encoding = PositionalEncoding(d_model=dim)
         self.query_projection = nn.Linear(dim, dim)
         self.key_projection = nn.Linear(dim, dim)
         self.value_projection = nn.Linear(dim, dim)
-        # self.pos_proj = nn.Linear(dim, dim, bias=False)
+        self.pos_projection = nn.Linear(dim, dim, bias=False)
         #
-        # self.dropout = nn.Dropout(p=dropout_p)
-        # self.u_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
-        # self.v_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
-        # torch.nn.init.xavier_uniform_(self.u_bias)
-        # torch.nn.init.xavier_uniform_(self.v_bias)
-        #
-        # self.out_proj = nn.Linear(dim, dim)
+
+        self.u_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
+        self.v_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
+        torch.nn.init.xavier_uniform_(self.u_bias)
+        torch.nn.init.xavier_uniform_(self.v_bias)
+
+        self.dropout = nn.Dropout(p=dropout_p)
+        self.out_projection = nn.Linear(dim, dim)
 
     def forward(
             self,
@@ -49,32 +49,34 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
     ) -> Tensor:
         batch_size, seq_length, _ = value.size()
 
-        # Positional embedding
-        pos_embedding = self.positional_embedding(seq_length)
+        # Positional embedding (U)
+        pos_embedding = self.positional_encoding(seq_length)
+        pos_embedding = self.pos_proj(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
 
-        # TODO:: need to understand...
+        # Q, K, V
         query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.d_head)
         key = self.key_projection(key).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
         value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
-        # pos_embedding = self.pos_proj(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
+
+        # Attention
 
         content_score = torch.matmul((query + self.u_bias).transpose(1, 2), key.transpose(2, 3))
-        # pos_score = torch.matmul((query + self.v_bias).transpose(1, 2), pos_embedding.permute(0, 2, 3, 1))
+        positional_score = torch.matmul((query + self.v_bias).transpose(1, 2), pos_embedding.permute(0, 2, 3, 1))
         # pos_score = self._relative_shift(pos_score)
         #
-        # score = (content_score + pos_score) / self.sqrt_dim
+        score = (content_score + positional_score) / self.sqrt_dim
         #
-        # if mask is not None:
-        #     mask = mask.unsqueeze(1)
-        #     score.masked_fill_(mask, -1e9)
-        #
-        # attn = F.softmax(score, -1)
-        # attn = self.dropout(attn)
-        #
-        # context = torch.matmul(attn, value).transpose(1, 2)
-        # context = context.contiguous().view(batch_size, -1, self.dim)
-        #
-        # return self.out_proj(context)
+        if mask is not None:
+            mask = mask.unsqueeze(1)
+            score.masked_fill_(mask, -1e9)
+
+        attn = F.softmax(score, -1)
+        attn = self.dropout(attn)
+
+        context = torch.matmul(attn, value).transpose(1, 2)
+        context = context.contiguous().view(batch_size, -1, self.dim)
+
+        return self.out_projection(context)
 
     def _relative_shift(self, pos_score: Tensor) -> Tensor:
         batch_size, num_heads, seq_length1, seq_length2 = pos_score.size()

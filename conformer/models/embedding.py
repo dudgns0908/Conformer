@@ -5,7 +5,7 @@ import torch
 from torch import nn, Tensor
 
 
-class PositionalEmbedding(nn.Module):
+class PositionalEncoding(nn.Module):
     """ Positional Embedding """
 
     def __init__(
