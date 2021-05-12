@@ -59,13 +59,11 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.d_head).permute(0, 2, 1, 3)
 
         # Attention
-
         content_score = torch.matmul((query + self.u_bias).transpose(1, 2), key.transpose(2, 3))
         positional_score = torch.matmul((query + self.v_bias).transpose(1, 2), pos_embedding.permute(0, 2, 3, 1))
-        # pos_score = self._relative_shift(pos_score)
-        #
+        positional_score = self._relative_shift(positional_score)
         score = (content_score + positional_score) / self.sqrt_dim
-        #
+
         if mask is not None:
             mask = mask.unsqueeze(1)
             score.masked_fill_(mask, -1e9)
