@@ -44,14 +44,13 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
             query: Tensor,
             key: Tensor,
             value: Tensor,
-            # pos_embedding: Tensor,
             mask: Optional[Tensor] = None,
     ) -> Tensor:
         batch_size, seq_length, _ = value.size()
 
         # Positional embedding (U)
         pos_embedding = self.positional_encoding(seq_length)
-        pos_embedding = self.pos_proj(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
+        pos_embedding = self.pos_projection(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
 
         # Q, K, V
         query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.d_head)
