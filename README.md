@@ -31,9 +31,13 @@ description
 
 
 ## Installation
-### Usage
-<h3>Train</h3>
+```shell
 
+```
+
+
+## Usage
+### Train
 ```python
 from conformer.trainer import Trainer
 Trainer().fit(...)
