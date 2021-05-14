@@ -6,7 +6,6 @@ PyTorch Implementation: [Convolution-augmented Transformer for Speech Recognitio
 
 ## **Working now...**
 
---- 
 
 ## Introduction
 This is an ASR model called **Conformer** made by Google. <br />
@@ -30,12 +29,9 @@ description
 ![Convolution Module](docs/images/convolution_module.png) <br />
 description
 
----
+
 ## Installation
-
----
-## Usage
-
+### Usage
 <h3>Train</h3>
 
 ```python
@@ -43,7 +39,7 @@ from conformer.trainer import Trainer
 Trainer().fit(...)
 ```
 
----
+
 ## Reference
 ### Paper 
 - **[Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/abs/2005.08100)**
