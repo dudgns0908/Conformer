@@ -29,7 +29,6 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
         self.key_projection = nn.Linear(dim, dim)
         self.value_projection = nn.Linear(dim, dim)
         self.pos_projection = nn.Linear(dim, dim, bias=False)
-        #
 
         self.u_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
         self.v_bias = nn.Parameter(torch.Tensor(self.num_heads, self.d_head))
@@ -50,6 +49,7 @@ class MultiHeadAttentionWithRelativePositionalEmbedding(nn.Module):
 
         # Positional embedding (U)
         pos_embedding = self.positional_encoding(seq_length)
+        pos_embedding = pos_embedding.repeat(batch_size, 1, 1)
         pos_embedding = self.pos_projection(pos_embedding).view(batch_size, -1, self.num_heads, self.d_head)
 
         # Q, K, V
