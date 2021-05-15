@@ -43,6 +43,12 @@ from conformer.trainer import Trainer
 Trainer().fit(...)
 ```
 
+### Evaluation
+```python
+from conformer.trainer import Trainer
+Trainer().fit(...)
+```
+
 
 ## Reference
 ### Paper 
