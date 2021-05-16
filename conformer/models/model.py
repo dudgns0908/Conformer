@@ -4,6 +4,7 @@ import torch
 from torch import nn, Tensor
 from torch.optim import Adam
 
+from conformer.models.decoder import ConformerDecoder
 from conformer.models.encoder import ConformerEncoder
 
 
@@ -42,10 +43,12 @@ class Conformer(nn.Module):
         ).to(self.device)
 
         # Decoder
-        self.decoder = None
+        self.decoder = ConformerDecoder()
 
     def forward(self, inputs: Tensor) -> Tensor:
-        return self.encoder(inputs)
+        encoder_output = self.encoder(inputs)
+        output = self.decoder(inputs)
+        return output
 
     def fit(self, inputs: Tensor, labels: Tensor) -> None:
         lr = 0.05 / (self.encoder_dim ** 0.5)

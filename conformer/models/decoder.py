@@ -13,7 +13,7 @@ class ConformerDecoder(nn.Module):
         assert decoder_name in self.decoder_dict.keys(), f"Not supported decoder name ({decoder_name})"
 
         if decoder_name == 'lstm':
-            self.decoder = self.decoder[decoder_name](
+            self.decoder = self.decoder_dict[decoder_name](
                 input_size=input_size,
                 hidden_size=hidden_size,
                 num_layers=num_layers,
