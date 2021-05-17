@@ -15,9 +15,9 @@ class ConformerDecoder(nn.Module):
             num_classes: int,
             max_length: int = 300,
             hidden_size: int = 4,
-            pad_id: int = 0,
             sos_id: int = 1,
             eos_id: int = 2,
+            pad_id: int = 0,
             num_heads: int = 4,
             num_layers: int = 2,
             dropout_p: float = 0.3,
@@ -26,6 +26,10 @@ class ConformerDecoder(nn.Module):
         super().__init__()
         self.num_classes = num_classes
         self.max_length = max_length
+        self.sos_id = sos_id
+        self.eos_id = eos_id
+        self.pad_id = pad_id
+        self.device = device
 
         self.embedding = nn.Embedding(num_embeddings=num_classes, embedding_dim=hidden_size)
         self.attention = MultiHeadAttention(hidden_size, num_heads=num_heads)
@@ -46,16 +50,21 @@ class ConformerDecoder(nn.Module):
             nn.Linear(hidden_size, num_classes),
         )
 
-        self.to(device)
-
     def forward(
             self,
             encoder_outputs: Tensor,
-            target: Optional[Tensor],
+            targets: Optional[Tensor],
             teacher_forcing_ratio: float = 1.0
     ):
-        # is_teacher_forcing = np.random.rand() < teacher_forcing_ratio
-        # if is_teacher_forcing:
+        batch_size = encoder_outputs.size(0)
+        if targets is None:
+            targets = torch.LongTensor([self.sos_id] * batch_size).view(batch_size, 1)
+            max_length = self.max_length
+            if self.device != 'cpu':
+                targets = targets.to(self.device)
 
+        is_teacher_forcing = np.random.rand() < teacher_forcing_ratio
+        if is_teacher_forcing:
+            pass
 
         return self.decoder(encoder_outputs)
