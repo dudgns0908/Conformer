@@ -7,7 +7,7 @@ from conformer.models import Conformer
 
 class Trainer:
     def __init__(self):
-        self.model = Conformer()
+        self.model = Conformer(vocab_size=80)
 
     def fit(self, inputs: Tensor, y: Tensor):
         output = self.model(inputs)
@@ -15,7 +15,7 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    temp_audio_data = torch.from_numpy(np.arange(2 * 257 * 80).reshape((2, 257, 80))).float()
+    temp_audio_data = torch.from_numpy(np.arange(2 * 100 * 80).reshape((2, 100, 80))).float()
 
     trainer = Trainer()
     trainer.fit(temp_audio_data, [])

@@ -13,6 +13,7 @@ class Conformer(nn.Module):
 
     def __init__(
             self,
+            vocab_size: int,
             input_dim: int = 80,
             encoder_dim: int = 512,
             num_encoder_layers: int = 17,
@@ -43,7 +44,7 @@ class Conformer(nn.Module):
         ).to(self.device)
 
         # Decoder
-        self.decoder = ConformerDecoder()
+        self.decoder = ConformerDecoder(vocab_size=vocab_size, hidden_size=decoder_dim)
 
     def forward(self, inputs: Tensor) -> Tensor:
         encoder_output = self.encoder(inputs)

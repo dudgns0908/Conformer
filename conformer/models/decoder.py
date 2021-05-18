@@ -12,9 +12,9 @@ class ConformerDecoder(nn.Module):
 
     def __init__(
             self,
-            num_classes: int,
+            vocab_size: int,
+            hidden_size: int = 640,
             max_length: int = 300,
-            hidden_size: int = 4,
             sos_id: int = 1,
             eos_id: int = 2,
             pad_id: int = 0,
@@ -24,14 +24,14 @@ class ConformerDecoder(nn.Module):
             device: torch.device = 'cpu'
     ):
         super().__init__()
-        self.num_classes = num_classes
+        self.vocab_size = vocab_size
         self.max_length = max_length
         self.sos_id = sos_id
         self.eos_id = eos_id
         self.pad_id = pad_id
         self.device = device
 
-        self.embedding = nn.Embedding(num_embeddings=num_classes, embedding_dim=hidden_size)
+        self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=hidden_size)
         self.attention = MultiHeadAttention(hidden_size, num_heads=num_heads)
         self.dropout = nn.Dropout(p=dropout_p)
         self.rnn = nn.LSTM(
@@ -42,18 +42,17 @@ class ConformerDecoder(nn.Module):
             bidirectional=True
         )
 
-
         self.fc = nn.Sequential(
             nn.Linear(hidden_size << 1, hidden_size),
             nn.Tanh(),
             # torch.View(shape=(-1, self.hidden_state_dim), contiguous=True),
-            nn.Linear(hidden_size, num_classes),
+            nn.Linear(hidden_size, vocab_size),
         )
 
     def forward(
             self,
             encoder_outputs: Tensor,
-            targets: Optional[Tensor],
+            targets: Optional[Tensor] = None,
             teacher_forcing_ratio: float = 1.0
     ):
         batch_size = encoder_outputs.size(0)
@@ -62,6 +61,11 @@ class ConformerDecoder(nn.Module):
             max_length = self.max_length
             if self.device != 'cpu':
                 targets = targets.to(self.device)
+
+        embedding = self.embedding(encoder_outputs.long())
+        rnn_out = self.rnn(embedding)
+        attention = self.attention(embedding, embedding, embedding)
+
 
         is_teacher_forcing = np.random.rand() < teacher_forcing_ratio
         if is_teacher_forcing:
