@@ -19,21 +19,27 @@ class ConformerBlock(nn.Module):
         super().__init__()
 
         self.sequential = nn.Sequential(
-            ResidualModule(module=FeedForwardModule(dim), factor=0.5),
-
-            # TODO:: 2. Multi Head Attention
-            ResidualModule(module=MultiHeadedSelfAttentionModule(
-                dim=dim,
-                num_heads=num_attention_heads,
-            )),
-
-            ResidualModule(module=ConvolutionModule(
-                in_channels=dim,
-                expansion_factor=conv_expansion_factor,
-                kernel_size=conv_kernel_size
-            )),
-
-            ResidualModule(module=FeedForwardModule(dim), factor=0.5),
+            ResidualModule(
+                module=FeedForwardModule(dim),
+                factor=0.5
+            ),
+            ResidualModule(
+                module=MultiHeadedSelfAttentionModule(
+                    dim=dim,
+                    num_heads=num_attention_heads,
+                )
+            ),
+            ResidualModule(
+                module=ConvolutionModule(
+                    in_channels=dim,
+                    expansion_factor=conv_expansion_factor,
+                    kernel_size=conv_kernel_size
+                )
+            ),
+            ResidualModule(
+                module=FeedForwardModule(dim),
+                factor=0.5
+            ),
             nn.LayerNorm(dim)
         )
 
