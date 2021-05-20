@@ -31,7 +31,7 @@ class ConformerDecoder(nn.Module):
         self.pad_id = pad_id
         self.device = device
 
-        self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=hidden_size)
+        self.embedding = nn.Embedding(vocab_size, hidden_size)
         self.attention = MultiHeadAttention(hidden_size, num_heads=num_heads)
         self.dropout = nn.Dropout(p=dropout_p)
         self.rnn = nn.LSTM(
@@ -61,8 +61,8 @@ class ConformerDecoder(nn.Module):
         #     max_length = self.max_length
         #     if self.device != 'cpu':
         #         targets = targets.to(self.device)
-
-        encoder_outputs.view((batch_size, self.vocab_size))
+        print(encoder_outputs.size())
+        # encoder_outputs.view((batch_size, self.vocab_size))
         embedding = self.embedding(encoder_outputs.long())
         rnn_out = self.rnn(embedding)
         # attention = self.attention(embedding, embedding, embedding)

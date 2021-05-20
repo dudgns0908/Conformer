@@ -45,8 +45,8 @@ Trainer().fit(...)
 
 ### Evaluation
 ```python
-from conformer.trainer import Trainer
-Trainer().fit(...)
+from conformer.predictor import Predictor
+Predictor().eval(...)
 ```
 
 
