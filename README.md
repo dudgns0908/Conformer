@@ -46,7 +46,7 @@ Trainer().fit(...)
 ### Evaluation
 ```python
 from conformer.predictor import Predictor
-Predictor().eval(...)
+Predictor(model_path='path/to/').eval(...)
 ```
 
 
