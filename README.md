@@ -52,7 +52,8 @@ Predictor(model_path='path/to/').eval(...)
 
 ## Reference
 ### Paper 
-- **[Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/abs/2005.08100)**
+- **[Conformer: Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/abs/2005.08100)**
+- **[Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860)**
 
 ### Github
 - **[sooftware/KoSpeech](https://github.com/sooftware/KoSpeech)**
