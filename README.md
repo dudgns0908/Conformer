@@ -53,6 +53,7 @@ Predictor(model_path='path/to/').eval(...)
 ## Reference
 ### Paper 
 - **[Conformer: Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/abs/2005.08100)**
+- **[Attention Is All You Need](https://arxiv.org/abs/1706.03762)**
 - **[Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context](https://arxiv.org/abs/1901.02860)**
 
 ### Github
