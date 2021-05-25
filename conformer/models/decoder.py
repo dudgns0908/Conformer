@@ -56,15 +56,15 @@ class ConformerDecoder(nn.Module):
             teacher_forcing_ratio: float = 1.0
     ):
         batch_size = encoder_outputs.size(0)
-        # if targets is None:
-        #     targets = torch.LongTensor([self.sos_id] * batch_size).view(batch_size, 1)
-        #     max_length = self.max_length
-        #     if self.device != 'cpu':
-        #         targets = targets.to(self.device)
-        print(encoder_outputs.size())
-        # encoder_outputs.view((batch_size, self.vocab_size))
-        embedding = self.embedding(encoder_outputs.long())
-        rnn_out = self.rnn(embedding)
+        if targets is None:
+            targets = torch.LongTensor([self.sos_id] * batch_size).view(batch_size, 1)
+            max_length = self.max_length
+            if self.device != 'cpu':
+                targets = targets.to(self.device)
+        # print(encoder_outputs.size())
+        encoder_outputs.view((batch_size, self.vocab_size))
+        # embedding = self.embedding(encoder_outputs.transfose(1, 2).long())
+        # rnn_out = self.rnn(embedding)
         # attention = self.attention(embedding, embedding, embedding)
 
 

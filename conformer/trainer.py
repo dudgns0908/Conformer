@@ -15,7 +15,7 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    temp_audio_data = torch.from_numpy(np.arange(2 * 100 * 80).reshape((2, 100, 80))).float()
+    temp_audio_data = torch.from_numpy(np.arange(1 * 100 * 80).reshape((1, 100, 80))).float()
 
     trainer = Trainer()
     trainer.fit(temp_audio_data, [])
