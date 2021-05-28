@@ -123,12 +123,17 @@ class MultiHeadAttention(nn.Module):
     def forward(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
         batch_size = query.shape[0]
 
-        query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.dk).transpose(1, 2).contiguous()
-        key = self.key_projection(key).view(batch_size, -1, self.num_heads, self.dk).transpose(1, 2).contiguous()
-        value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.dk).transpose(1, 2).contiguous()
+        query = self.query_projection(query).view(batch_size, -1, self.num_heads, self.dk)
+        key = self.key_projection(key).view(batch_size, -1, self.num_heads, self.dk)
+        value = self.value_projection(value).view(batch_size, -1, self.num_heads, self.dk)
+
+        query = query.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, -1, self.dk)
+        key = key.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, -1, self.dk)
+        value = value.permute(2, 0, 1, 3).contiguous().view(batch_size * self.num_heads, -1, self.dk)
 
         attention = self.scaled_dot_product_attention(query, key, value)
-        concat = attention.transpose(1, 2).contiguous().view(batch_size, -1, self.num_heads * self.dk)
+        attention = attention.view(self.num_heads, batch_size, -1, self.dk)
+        concat = attention.permute(1, 2, 0, 3).contiguous().view(batch_size, -1, self.num_heads * self.dk)
         linear = self.linear(concat)
 
         return linear
