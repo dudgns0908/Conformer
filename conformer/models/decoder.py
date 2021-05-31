@@ -18,7 +18,7 @@ class ConformerDecoder(nn.Module):
             sos_id: int = 1,
             eos_id: int = 2,
             pad_id: int = 0,
-            num_heads: int = 4,
+            num_heads: int = 8,
             num_layers: int = 2,
             dropout_p: float = 0.3,
             device: torch.device = 'cpu'

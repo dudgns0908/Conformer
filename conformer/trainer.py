@@ -7,7 +7,10 @@ from conformer.models import Conformer
 
 class Trainer:
     def __init__(self):
-        self.model = Conformer(vocab_size=80)
+        self.model = Conformer(
+            encoder_dim=256,
+            vocab_size=80,
+        )
 
     def fit(self, inputs: Tensor, y: Tensor):
         output = self.model(inputs)

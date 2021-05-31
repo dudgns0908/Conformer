@@ -114,9 +114,9 @@ class MultiHeadAttention(nn.Module):
         self.num_heads = num_heads
         self.dk = dim // num_heads
 
-        self.query_projection = nn.Linear(dim, dim * self.dk)
-        self.key_projection = nn.Linear(dim, dim * self.dk)
-        self.value_projection = nn.Linear(dim, dim * self.dk)
+        self.query_projection = nn.Linear(dim, num_heads * self.dk)
+        self.key_projection = nn.Linear(dim, num_heads * self.dk)
+        self.value_projection = nn.Linear(dim, num_heads * self.dk)
         self.scaled_dot_product_attention = ScaledDotProductAttention(dim=self.dk)
         self.linear = nn.Linear(self.dk * self.num_heads, dim)
 

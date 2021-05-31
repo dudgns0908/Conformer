@@ -44,7 +44,7 @@ class Conformer(nn.Module):
         ).to(self.device)
 
         # Decoder
-        self.decoder = ConformerDecoder(vocab_size=vocab_size, hidden_size=decoder_dim)
+        self.decoder = ConformerDecoder(vocab_size=vocab_size, hidden_size=encoder_dim)
 
     def forward(self, inputs: Tensor) -> Tensor:
         encoder_output = self.encoder(inputs)
