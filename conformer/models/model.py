@@ -25,6 +25,7 @@ class Conformer(nn.Module):
             decoder_name: str = None,
             decoder_dim: int = 640,
             num_decoder_layers: int = 1,
+            max_length: int = 300,
 
             # Device
             device: torch.device = 'cpu'
@@ -44,7 +45,12 @@ class Conformer(nn.Module):
         ).to(self.device)
 
         # Decoder
-        self.decoder = ConformerDecoder(vocab_size=vocab_size, hidden_size=encoder_dim)
+        self.decoder = ConformerDecoder(
+            vocab_size=vocab_size,
+            hidden_size=encoder_dim,
+            max_length=max_length,
+            device=self.device,
+        ).to(self.device)
 
     def forward(self, inputs: Tensor) -> Tensor:
         encoder_output = self.encoder(inputs)

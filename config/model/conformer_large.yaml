@@ -1,0 +1,5 @@
+encoder_dim: 512
+num_encoder_layers: 17
+num_attention_heads: 8
+conv_kernel_size: 31
+dropout_p: 0.1
