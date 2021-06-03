@@ -1,2 +1,4 @@
 # @package data
 audio_path: ../dataset/*.pcm
+dataset_download: False
+vocab_size: 5000

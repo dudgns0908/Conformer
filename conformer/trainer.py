@@ -18,15 +18,15 @@ class Trainer:
         self.transcripts = transcripts
 
         self.model = Conformer(
-            vocab_size=config.vocab_size,
-            input_dim=inputs.shape(1),
-            encoder_dim=config.encoder_dim,
-            num_encoder_layers=config.num_encoder_layers,
-            num_attention_heads=config.num_attention_heads,
-            conv_kernel_size=config.conv_kernel_size,
-            dropout_p=config.dropout_p,
-            max_length=config.max_length,
-            device=config.device,
+            vocab_size=config.data.vocab_size,
+            input_dim=inputs.size(1),
+            encoder_dim=config.model.encoder_dim,
+            num_encoder_layers=config.model.num_encoder_layers,
+            num_attention_heads=config.model.num_attention_heads,
+            conv_kernel_size=config.model.conv_kernel_size,
+            dropout_p=config.model.dropout_p,
+            max_length=config.train.max_length,
+            device=config.train.device,
         )
 
     def fit(self):

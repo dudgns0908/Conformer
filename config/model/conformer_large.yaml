@@ -1,3 +1,4 @@
+# @package model
 encoder_dim: 512
 num_encoder_layers: 17
 num_attention_heads: 8

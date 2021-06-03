@@ -1,6 +1,6 @@
 # @package train
 batch_size: 32
 epoch: 100
-max_len: 80
+max_length: 80
 
 device: cpu

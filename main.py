@@ -4,12 +4,16 @@ from dataclasses import dataclass
 import hydra
 import numpy as np
 import torch
+from hydra.core.config_store import ConfigStore
 from omegaconf import DictConfig, OmegaConf
 
 #
 # @dataclass
 # class TestConfig:
 #     phase: str = 'train'
+from conformer.configs.data import DataConfig
+from conformer.configs.model import ConformerLargeConfig
+from conformer.configs.train import TrainConfig
 from conformer.trainer import Trainer
 
 log = logging.getLogger(__name__)
@@ -21,20 +25,29 @@ def train(config: DictConfig):
     transcripts = [[1, 2, 3, 4, 5, 56]]
 
     # get model
-    trainer = Trainer(config)
-
-    # train
-    trainer.fit(
+    trainer = Trainer(
+        config=config,
         inputs=inputs,
         transcripts=transcripts,
-        num_epoch=config.num_epoch
     )
+
+    # train
+    trainer.fit()
+
+
+
+
+
+cs = ConfigStore.instance()
+cs.store(group="data", name="default", node=DataConfig)
+cs.store(group="train", name="default", node=TrainConfig)
+cs.store(group="model", name="conformer-large", node=ConformerLargeConfig)
 
 
 @hydra.main(config_path='./config', config_name='config')
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
-    print(cfg)
+    train(cfg)
 
 
 if __name__ == '__main__':
