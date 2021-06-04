@@ -19,7 +19,7 @@ class Trainer:
 
         self.model = Conformer(
             vocab_size=config.data.vocab_size,
-            input_dim=inputs.size(1),
+            input_dim=inputs.size(2),
             encoder_dim=config.model.encoder_dim,
             num_encoder_layers=config.model.num_encoder_layers,
             num_attention_heads=config.model.num_attention_heads,

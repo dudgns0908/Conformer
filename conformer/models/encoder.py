@@ -68,7 +68,7 @@ class ConformerEncoder(nn.Module):
         self.spec_augmentation = None
 
         self.conv_subsampling = Conv2dSubsampling(1, encoder_dim)
-        self.liner = nn.Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim)
+        self.linear = nn.Linear(encoder_dim * (((input_dim - 1) // 2 - 1) // 2), encoder_dim)
         self.dropout = nn.Dropout(p=dropout_p)
 
         self.conformer_blocks = nn.ModuleList()
@@ -85,7 +85,7 @@ class ConformerEncoder(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         output = self.conv_subsampling(inputs)
-        output = self.liner(output)
+        output = self.linear(output)
         output = self.dropout(output)
 
         for conformer_block in self.conformer_blocks:
