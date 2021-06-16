@@ -19,4 +19,4 @@ def load_audio(path: str, sampling_rate: int = 16000):
 
 
 if __name__ == '__main__':
-    load_audio('../../datasets/KsponSpeech/valid/01')
+    load_audio('./test.wav')

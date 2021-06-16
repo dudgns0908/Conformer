@@ -21,8 +21,11 @@ log = logging.getLogger(__name__)
 
 def train(config: DictConfig):
     # Load data
-    inputs = torch.from_numpy(np.arange(10 * 100 * 80).reshape((10, 100, 80))).float()
-    transcripts = [[1, 2, 3, 4, 5, 56]]
+    batch_size = 10
+
+    input_dim = 80
+    inputs = torch.from_numpy(np.arange(batch_size * 100 * input_dim).reshape((batch_size, 100, input_dim))).float()
+    transcripts = torch.from_numpy([[1, 2, 3, 4, 5, 56]])
 
     # get model
     trainer = Trainer(
