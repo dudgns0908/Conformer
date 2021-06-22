@@ -11,6 +11,7 @@ def load_audio(path: str, sampling_rate: int = 16000):
             signal, _ = librosa.load(path, sr=sampling_rate)
         elif extension == 'pcm':
             signal = np.memmap(path, dtype='h', mode='r').astype('float32')
+            return signal / 32767  # normalize audio
         else:
             raise ValueError(f'This extension ({extension}) is not supported')
 
