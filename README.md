@@ -1,4 +1,4 @@
-# Conformer
+# KoASR
 PyTorch Implementation: [Convolution-augmented Transformer for Speech Recognition](https://arxiv.org/abs/2005.08100)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -38,14 +38,18 @@ description
 
 ## Usage
 ### Train
+
 ```python
-from conformer.trainer import Trainer
+from koasr.trainer import Trainer
+
 Trainer().fit(...)
 ```
 
 ### Evaluation
+
 ```python
-from conformer.predictor import Predictor
+from koasr.predictor import Predictor
+
 Predictor(model_path='path/to/').eval(...)
 ```
 
