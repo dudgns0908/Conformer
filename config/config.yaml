@@ -2,3 +2,4 @@ defaults:
   - model: conformer_large
   - data: default
   - train: default
+  - device: cpu

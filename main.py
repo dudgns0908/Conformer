@@ -38,9 +38,6 @@ def train(config: DictConfig):
     trainer.fit()
 
 
-
-
-
 cs = ConfigStore.instance()
 cs.store(group="data", name="default", node=DataConfig)
 cs.store(group="train", name="default", node=TrainConfig)
@@ -50,7 +47,8 @@ cs.store(group="model", name="conformer-large", node=ConformerLargeConfig)
 @hydra.main(config_path='./config', config_name='config')
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
-    train(cfg)
+
+    # train(cfg)
 
 
 if __name__ == '__main__':

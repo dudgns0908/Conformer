@@ -4,31 +4,25 @@ from omegaconf import DictConfig
 from torch import Tensor
 
 from koasr.models import Conformer
+from koasr.utils.model_info import model_dict
 
 
 class Trainer:
     def __init__(
             self,
-            config: DictConfig,
             inputs: Tensor,
             transcripts: Tensor,
+            model_name: str,
+            model_params: dict,
     ):
-        self.config = config
+        assert model_name in model_dict.keys(), f'This is Not supported model name ({model_name})'
+
         self.inputs = inputs
         self.transcripts = transcripts
 
-        self.model = Conformer(
-            vocab_size=80
-            # vocab_size=config.data.vocab_size,
-            # input_dim=inputs.size(2),
-            # encoder_dim=config.model.encoder_dim,
-            # num_encoder_layers=config.model.num_encoder_layers,
-            # num_attention_heads=config.model.num_attention_heads,
-            # conv_kernel_size=config.model.conv_kernel_size,
-            # dropout_p=config.model.dropout_p,
-            # max_length=config.train.max_length,
-            # device=config.train.device,
-        )
+        self.datasets = None
+        # self.model = model_dict[model_name](vocab_size=80, **model_params)
+        self.model = Conformer(**model_params)
 
     def fit(self):
         temp_audio_data = torch.from_numpy(np.arange(10 * 100 * 80).reshape((10, 100, 80))).float()
