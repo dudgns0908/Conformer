@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import nn, Tensor
 
-from koasr.attention import MultiHeadAttention
+from koasr.modules.attention import MultiHeadAttention
 
 
 class ConformerDecoder(nn.Module):

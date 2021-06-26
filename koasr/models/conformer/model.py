@@ -4,7 +4,7 @@ import torch
 from torch import nn, Tensor
 from torch.optim import Adam
 
-from koasr.decoder import ConformerDecoder
+from koasr.models.conformer.decoder import ConformerDecoder
 from koasr.models.conformer.encoder import ConformerEncoder
 
 

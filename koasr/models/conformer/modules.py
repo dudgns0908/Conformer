@@ -1,8 +1,8 @@
 import torch
 from torch import nn, Tensor
-from koasr.activations import Swish
-from koasr.attention import MultiHeadAttentionWithRelativePositionalEmbedding
-from koasr.convolutions import PointwiseConv1d, DepthwiseConv1d
+from koasr.modules.activations import Swish
+from koasr.modules.attention import MultiHeadAttentionWithRelativePositionalEmbedding
+from koasr.modules.convolutions import PointwiseConv1d, DepthwiseConv1d
 
 
 class MultiHeadedSelfAttentionModule(nn.Module):

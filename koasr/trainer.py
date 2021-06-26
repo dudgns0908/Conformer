@@ -3,7 +3,7 @@ import torch
 from omegaconf import DictConfig
 from torch import Tensor
 
-from koasr.data.data_loader import AudioDataset
+from koasr.data.dataset import AudioDataset
 from koasr.models import Conformer
 from koasr.utils.model_info import model_dict
 
@@ -12,17 +12,16 @@ class Trainer:
     def __init__(
             self,
             dataset_dir: str,
-            dataset_name: str,
             model_name: str,
             model_params: dict,
     ):
-        assert model_name in model_dict.keys(), f'This is Not supported model name ({model_name})'
+        assert model_name.lower() in model_dict.keys(), f'This is Not supported model name ({model_name})'
 
         self.dataset_dir = dataset_dir
-        self.transcript_path = transcript_path
+        # self.transcript_path = transcript_path
 
 
-        self.datasets = AudioDataset(dataset_dir, dataset_name)
+        self.datasets = AudioDataset(dataset_dir, audio_paths=[], transcripts=[])
         # self.model = model_dict[model_name](vocab_size=80, **model_params)
         self.model = Conformer(**model_params)
 
@@ -34,5 +33,6 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    trainer = Trainer(None, None, None)
+    model_name = 'Conformer'
+    trainer = Trainer(None, model_name, {'vocab_size': 80})
     trainer.fit()

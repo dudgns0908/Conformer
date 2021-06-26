@@ -5,7 +5,8 @@ PyTorch Implementation: [Convolution-augmented Transformer for Speech Recognitio
 [![Framework](https://img.shields.io/badge/Framework-PyTorch-red.svg)](https://pytorch.org/)
 
 ## **Working now...**
-
+데이터 로드 => 전처리 => 배치 => 학습 =>
+- 확장자별    - 데이터셋별
 
 ## Introduction
 This is an ASR model called **Conformer** made by Google. <br />

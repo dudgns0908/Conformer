@@ -3,7 +3,7 @@ from torch import nn, Tensor
 from torch.nn import LayerNorm
 
 from koasr.models.conformer.modules import *
-from koasr.convolutions import Conv2dSubsampling
+from koasr.modules.convolutions import Conv2dSubsampling
 
 
 class ConformerBlock(nn.Module):
