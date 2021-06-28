@@ -12,8 +12,7 @@ def preprocess_ksponspeech(dataset_path, mode='phonetic'):
     transcripts = list()
 
     with Parallel(n_jobs=cpu_count() - 1) as parallel:
-        for folder in os.listdir(dataset_path):
-            # folder : {KsponSpeech_01, ..., KsponSpeech_05}
+        for folder in os.listdir(dataset_path):  # {KsponSpeech_01, ..., KsponSpeech_05}
             path = os.path.join(dataset_path, folder)
             if not folder.startswith('KsponSpeech') or not os.path.isdir(path):
                 continue
