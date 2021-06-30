@@ -1,24 +1,48 @@
-from koasr.preprocess.ksponspeech import preprocess_ksponspeech
+from koasr.preprocess.ksponspeech import KsponSpeech
 
 dataset_dict = {
-    'ksponspeech': preprocess_ksponspeech
+    'ksponspeech': KsponSpeech
 }
+
+
+class Preprocess:
+    def __init__(
+            self,
+            dataset_name: str,
+            dataset_path: str,
+            mode: str = 'phonetic',  # phonetic | spelling
+    ):
+        dataset_name = dataset_name.lower()
+        assert dataset_name in dataset_dict.keys(), f'{dataset_name} dataset is not supported.'
+
+        self.dataset_path = dataset_path
+        self.preprocess_func = dataset_dict[dataset_name]
+        self.mode = mode
+
+    def _run_preprocess(self):
+        audio_paths, transcripts = self.preprocess_func(dataset_path=self.dataset_path, mode=self.mode)
+        return audio_paths, transcripts
+
 
 
 def preprocess(
         dataset_name: str,
         dataset_path: str,
-        mode: str = 'phonetic'
+        mode: str = 'phonetic',
+        save_path: str = './'
 ):
-    dataset_name = dataset_name.lower()
-    assert dataset_name in dataset_dict.keys(), f'{dataset_name} dataset is not supported.'
+    KsponSpeech().preprocess(
+        dataset_path,
+        script_file_dir=f'/Users/younghun/Data/ksponspeech/script',
 
-    import time
+    )
+    # dataset_name = dataset_name.lower()
+    # assert dataset_name in dataset_dict.keys(), f'{dataset_name} dataset is not supported.'
+    #
+    # preprocess_func = dataset_dict[dataset_name]
+    # audio_paths, transcripts = preprocess_func(dataset_path=dataset_path, mode=mode)
 
-    preprocess_func = dataset_dict[dataset_name]
-
-    start = time.time()
-    return print(preprocess_func(dataset_path=dataset_path, mode=mode)), print(time.time() - start)
+    return None
 
 
 preprocess('ksponspeech', '/Users/younghun/Data/ksponspeech/train/')

@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Union
 
 import ray
 
@@ -85,41 +86,62 @@ def special_filter(sentence, mode='phonetic', replace=None):
     return new_sentence
 
 
-def get_filtered_sentence(file_path, mode):
-    with open(file_path, 'r', encoding='cp949') as f:
-        sentence = f.read()
-        file_name = os.path.basename(file_path)
-        replace = PERCENT_FILES.get(file_name[12:18], None)
-        return special_filter(bracket_filter(sentence, mode), mode, replace)
+def sentence_filter(sentence, mode, replace):
+    return special_filter(bracket_filter(sentence, mode), mode, replace)
 
 
-def preprocess_ksponspeech(dataset_path, mode='phonetic'):
-    print('preprocess started..')
+class KsponSpeech:
+    train_trn = ('train.trn', )
+    eval_trn = ("eval_clean.trn", "eval_other.trn")
 
-    audio_paths = list()
-    transcripts = list()
-    with Parallel(n_jobs=cpu_count() - 1) as parallel:
-        for folder in os.listdir(dataset_path):  # {KsponSpeech_01, ..., KsponSpeech_05}
-            path = os.path.join(dataset_path, folder)
-            if not folder.startswith('KsponSpeech') or not os.path.isdir(path):
-                continue
+    def preprocess(
+            self,
+            dataset_path: str,
+            script_file_dir: str,
+            mode: str = 'phonetic',
+    ):
 
-            for idx, subfolder in tqdm(enumerate(os.listdir(path)), desc=f'Preprocess text files on {path}'):
-                path = os.path.join(dataset_path, folder, subfolder)
-                if not os.path.isdir(path):
-                    continue
+        train_audio_paths, train_transcripts = self.preprocess_sentence(script_file_dir, self.train_trn, mode)
+        eval_audio_paths, eval_transcripts = self.preprocess_sentence(script_file_dir, self.eval_trn, mode)
 
-                text_file_list = []
-                audio_sub_file_list = []
-                relative_path = os.path.join(folder, subfolder)
-                for file_name in os.listdir(path):
-                    if file_name.endswith('.txt'):
-                        file_path = os.path.join(path, file_name)
-                        text_file_list.append(file_path)
-                        audio_sub_file_list.append(os.path.join(relative_path, file_name))
+        audio_paths = train_audio_paths + eval_audio_paths
+        transcripts = train_transcripts + eval_transcripts
+        # if self.configs.vocab.unit == 'kspon_character':
+        #     generate_character_labels(transcripts, self.configs.vocab.vocab_path)
+        #     generate_character_script(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
+        #
+        # elif self.configs.vocab.unit == 'kspon_subword':
+        #     train_sentencepiece(transcripts, self.configs.vocab.vocab_size, self.configs.vocab.blank_token)
+        #     sentence_to_subwords(
+        #         audio_paths, transcripts, manifest_file_path, sp_model_path=self.configs.vocab.sp_model_path
+        #     )
+        #
+        # elif self.configs.vocab.unit == 'kspon_grapheme':
+        #     sentence_to_grapheme(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
+        #
+        # else:
+        #     raise ValueError(f"Unsupported vocab : {self.configs.vocab.unit}")
 
-                new_sentence = parallel(delayed(get_filtered_sentence)(s, mode) for s in text_file_list)
-                transcripts.extend(new_sentence)
-                audio_paths.extend(audio_sub_file_list)
+    def preprocess_sentence(
+            self,
+            script_file_dir: str,
+            script_file_name: Union[str, tuple, list],
+            mode: str = 'phonetic'
+    ):
+        script_names = [script_file_name] if isinstance(script_file_name, str) else script_file_name
 
-    return audio_paths, transcripts
+        audio_paths = []
+        transcripts = []
+        for script_name in script_names:
+            print(f'star preprocess {script_name}')
+            with open(os.path.join(script_file_dir, script_name), 'r') as f:
+                for line in tqdm(f.readlines()):
+                    audio_path, raw_transcript = line.split(" :: ")
+                    audio_paths.append(audio_path)
+
+                    file_name = os.path.basename(audio_path)
+                    replace = PERCENT_FILES.get(file_name[12:18], None)
+                    transcript = sentence_filter(raw_transcript, mode=mode, replace=replace)
+                    transcripts.append(transcript)
+
+        return audio_paths, transcripts
