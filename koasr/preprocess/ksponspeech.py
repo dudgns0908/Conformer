@@ -92,15 +92,27 @@ def sentence_filter(sentence, mode, replace):
     return special_filter(bracket_filter(sentence, mode), mode, replace)
 
 
+class KsponSpeechModeType:
+    PHOENTIC: str = 'phonetic'
+    SPELLING: str = 'spelling'
+
+
+class KsponSpeechVocabType:
+    CHARACTER: str = 'character'
+    SUBWORD: str = 'subword'
+    GRAPHEME: str = 'grapheme'
+
+
 class KsponSpeech:
-    train_trn = ('train.trn', )
+    train_trn = ('train.trn',)
     eval_trn = ("eval_clean.trn", "eval_other.trn")
 
     def preprocess(
             self,
             dataset_path: str,
             script_file_dir: str,
-            mode: str = 'phonetic',
+            mode: str = KsponSpeechModeType.PHOENTIC,
+            unit: KsponSpeechVocabType = KsponSpeechVocabType.SUBWORD,
     ):
 
         train_audio_paths, train_transcripts = self.preprocess_sentence(script_file_dir, self.train_trn, mode)
@@ -111,7 +123,7 @@ class KsponSpeech:
 
         manifest_file_path: str = './'
         vocab_path: str = './'
-        self.sentence_to_grapheme(audio_paths, transcripts ,manifest_file_path, vocab_path)
+        self.sentence_to_grapheme(audio_paths, transcripts, manifest_file_path, vocab_path)
         # if self.configs.vocab.unit == 'kspon_character':
         #     generate_character_labels(transcripts, self.configs.vocab.vocab_path)
         #     generate_character_script(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
