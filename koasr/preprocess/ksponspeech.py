@@ -123,7 +123,13 @@ class KsponSpeech:
 
         manifest_file_path: str = './'
         vocab_path: str = './'
-        self.sentence_to_grapheme(audio_paths, transcripts, manifest_file_path, vocab_path)
+        self.sentence2vocab(
+            audio_paths,
+            transcripts,
+            manifest_file_path,
+            vocab_path,
+            unit=KsponSpeechVocabType.GRAPHEME
+        )
         # if self.configs.vocab.unit == 'kspon_character':
         #     generate_character_labels(transcripts, self.configs.vocab.vocab_path)
         #     generate_character_script(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
@@ -164,12 +170,12 @@ class KsponSpeech:
 
         return audio_paths, transcripts
 
-    def sentence2unit(self, unit='grapheme'):
-        pass
+    def sentence2vocab(self, audio_paths, transcripts, manifest_file_path, vocab_path, unit=KsponSpeechVocabType.GRAPHEME):
+        if unit == KsponSpeechVocabType.GRAPHEME:
+            self.to_grapheme(audio_paths, transcripts, manifest_file_path, vocab_path)
 
-    def sentence_to_grapheme(self, audio_paths, transcripts, manifest_file_path: str, vocab_path: str):
+    def to_grapheme(self, audio_paths, transcripts, manifest_file_path: str, vocab_path: str):
         grapheme_transcripts = list()
-
         for transcript in transcripts:
             grapheme_transcripts.append(" ".join(unicodedata.normalize('NFKD', transcript).replace(' ', '|')).upper())
 
