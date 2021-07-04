@@ -133,21 +133,6 @@ class KsponSpeech:
             vocab_path,
             unit=KsponSpeechVocabType.GRAPHEME
         )
-        # if self.configs.vocab.unit == 'kspon_character':
-        #     generate_character_labels(transcripts, self.configs.vocab.vocab_path)
-        #     generate_character_script(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
-        #
-        # elif self.configs.vocab.unit == 'kspon_subword':
-        #     train_sentencepiece(transcripts, self.configs.vocab.vocab_size, self.configs.vocab.blank_token)
-        #     sentence_to_subwords(
-        #         audio_paths, transcripts, manifest_file_path, sp_model_path=self.configs.vocab.sp_model_path
-        #     )
-        #
-        # elif self.configs.vocab.unit == 'kspon_grapheme':
-        #     sentence_to_grapheme(audio_paths, transcripts, manifest_file_path, self.configs.vocab.vocab_path)
-        #
-        # else:
-        #     raise ValueError(f"Unsupported vocab : {self.configs.vocab.unit}")
 
     def preprocess_sentence(
             self,
@@ -160,7 +145,6 @@ class KsponSpeech:
         audio_paths = []
         transcripts = []
         for script_name in script_names:
-            print(f'star preprocess {script_name}')
             with open(os.path.join(script_file_dir, script_name), 'r') as f:
                 for line in tqdm(f.readlines()):
                     audio_path, raw_transcript = line.split(" :: ")
@@ -181,21 +165,24 @@ class KsponSpeech:
             vocab_path: str,
             unit=KsponSpeechVocabType.GRAPHEME
     ):
+        vocabs = []
         if unit == KsponSpeechVocabType.GRAPHEME:
-            grapheme_df = self.generate_grapheme(transcripts, vocab_path)
+            vocabs = self.generate_grapheme(transcripts, vocab_path)
 
         vocab2id, id2vocab = self.get_label(vocab_path)
         with open(manifest_file_path, "w") as f:
-            for audio_path, transcript in zip(audio_paths, transcripts):
-                vocab_id_transcript = self.sentence_to_target(transcript, vocab2id)
+            for audio_path, transcript, vocab in zip(audio_paths, transcripts, vocabs):
+                vocab_id_transcript = self.sentence_to_target(vocab.split(), vocab2id)
                 f.write(f'{audio_path}\t{transcript}\t{vocab_id_transcript}\n')
 
     def generate_grapheme(self, sentences: list, vocab_path: str) -> pd.DataFrame:
         vocabs = list()
         vocab_freq = list()
-        for sentence in sentences:
-            graphemes = " ".join(unicodedata.normalize('NFKD', sentence).replace(' ', '|')).upper()
-            for grapheme in graphemes:
+        graphemes = []
+        for sentence in tqdm(sentences):
+            sentence_grapheme = unicodedata.normalize('NFKD', sentence).replace(' ', '|').upper()
+            graphemes.append(sentence_grapheme)
+            for grapheme in sentence_grapheme:
                 if grapheme not in vocabs:
                     vocabs.append(grapheme)
                     vocab_freq.append(1)
@@ -203,32 +190,32 @@ class KsponSpeech:
                     vocab_freq[vocabs.index(grapheme)] += 1
 
         vocab_dict = {
-            'id': [0, 1, 2, 3],
-            'grapheme': ['<pad>', '<sos>', '<eos>', '<blank>'],
-            'freq': [0, 0, 0, 0]
+            'id': [0, 1, 2],
+            'vocab': ['<pad>', '<sos>', '<eos>'],
+            'freq': [0, 0, 0]
         }
 
-        vocab_freq, vocab_list = zip(*sorted(zip(vocab_freq, vocabs), reverse=True))
-        for idx, (freq, grapheme) in enumerate(zip(vocab_freq, vocab_list), start=4):
+        # vocab_freq, vocab_list = zip(*sorted(zip(vocab_freq, vocabs), reverse=True))
+        for idx, (freq, grapheme) in enumerate(sorted(zip(vocab_freq, vocabs), reverse=True), start=3):
             vocab_dict['id'].append(idx)
-            vocab_dict['grapheme'].append(grapheme)
+            vocab_dict['vocab'].append(grapheme)
             vocab_dict['freq'].append(freq)
 
         vocab_df = pd.DataFrame(vocab_dict)
         vocab_df.to_csv(vocab_path, encoding="utf-8", index=False)
-        return vocab_df
+        return graphemes
 
     def get_label(self, vocab_path: str):
         vocab_data_frame = pd.read_csv(vocab_path, encoding="utf-8")
         id_list = vocab_data_frame["id"]
-        grpm_list = vocab_data_frame["grpm"]
+        vocab_list = vocab_data_frame["vocab"]
 
-        grpm2id = dict()
+        vocab2id = dict()
         id2grpm = dict()
-        for _id, grpm in zip(id_list, grpm_list):
-            grpm2id[grpm] = _id
+        for _id, grpm in zip(id_list, vocab_list):
+            vocab2id[grpm] = _id
             id2grpm[_id] = grpm
-        return grpm2id, id2grpm
+        return vocab2id, id2grpm
 
     def sentence_to_target(self, transcript, vocab2id):
         target = str()
