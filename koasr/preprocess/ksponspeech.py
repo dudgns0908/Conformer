@@ -131,7 +131,7 @@ class KsponSpeech:
             transcripts,
             manifest_file_path,
             vocab_path,
-            unit=KsponSpeechVocabType.GRAPHEME
+            unit=KsponSpeechVocabType.CHARACTER
         )
 
     def preprocess_sentence(
@@ -163,19 +163,21 @@ class KsponSpeech:
             transcripts: list,
             manifest_file_path: str,
             vocab_path: str,
-            unit=KsponSpeechVocabType.GRAPHEME
+            unit=KsponSpeechVocabType.CHARACTER
     ):
         vocabs = []
         if unit == KsponSpeechVocabType.GRAPHEME:
             vocabs = self.generate_grapheme(transcripts, vocab_path)
+        elif unit == KsponSpeechVocabType.CHARACTER:
+            vocabs = self.generate_character(transcripts, vocab_path)
 
         vocab2id, id2vocab = self.get_label(vocab_path)
         with open(manifest_file_path, "w") as f:
             for audio_path, transcript, vocab in zip(audio_paths, transcripts, vocabs):
-                vocab_id_transcript = self.sentence_to_target(vocab.split(), vocab2id)
+                vocab_id_transcript = self.sentence_to_target(vocab, vocab2id)
                 f.write(f'{audio_path}\t{transcript}\t{vocab_id_transcript}\n')
 
-    def generate_grapheme(self, sentences: list, vocab_path: str) -> pd.DataFrame:
+    def generate_grapheme(self, sentences: list, vocab_path: str) -> list:
         vocabs = list()
         vocab_freq = list()
         graphemes = []
@@ -204,6 +206,42 @@ class KsponSpeech:
         vocab_df = pd.DataFrame(vocab_dict)
         vocab_df.to_csv(vocab_path, encoding="utf-8", index=False)
         return graphemes
+
+    def generate_character(self, sentences: list, vocab_path: str) -> list:
+        vocabs = list()
+        vocab_freq = list()
+
+        for sentence in sentences:
+            for ch in sentence:
+                if ch not in vocabs:
+                    vocabs.append(ch)
+                    vocab_freq.append(1)
+                else:
+                    vocab_freq[vocabs.index(ch)] += 1
+
+        # sort together Using zip
+        label_freq, label_list = zip(*sorted(zip(vocab_freq, vocabs), reverse=True))
+        label = {
+            'id': [0, 1, 2, 3],
+            'vocab': ['<pad>', '<sos>', '<eos>', '<blank>'],
+            'freq': [0, 0, 0, 0]
+        }
+
+        for idx, (ch, freq) in enumerate(zip(label_list, label_freq)):
+            label['id'].append(idx + 4)
+            label['vocab'].append(ch)
+            label['freq'].append(freq)
+
+        label['id'] = label['id'][:2000]
+        label['vocab'] = label['vocab'][:2000]
+        label['freq'] = label['freq'][:2000]
+
+        label_df = pd.DataFrame(label)
+        label_df.to_csv(vocab_path, encoding="utf-8", index=False)
+        return sentences
+
+    def generate_subword(self, sentences: list, vocab_path: str) -> list:
+        vocabs = list()
 
     def get_label(self, vocab_path: str):
         vocab_data_frame = pd.read_csv(vocab_path, encoding="utf-8")
