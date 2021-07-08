@@ -177,6 +177,48 @@ class KsponSpeech:
                 vocab_id_transcript = self.sentence_to_target(vocab, vocab2id)
                 f.write(f'{audio_path}\t{transcript}\t{vocab_id_transcript}\n')
 
+    def generate_vocab(
+            self,
+            sentences: list,
+            vocab_path: str,
+            vocab_type=KsponSpeechVocabType.GRAPHEME
+    ) -> list:
+        vocabs = list()
+        vocab_freq = list()
+        result = list()
+        for sentence in tqdm(sentences):
+            sentence_vocab = sentence
+            if vocab_type == KsponSpeechVocabType.GRAPHEME:
+                sentence_vocab = unicodedata.normalize('NFKD', sentence).replace(' ', '|').upper()
+
+            result.append(sentence_vocab)
+            for vocab in sentence_vocab:
+                if vocab not in vocabs:
+                    vocabs.append(vocab)
+                    vocab_freq.append(1)
+                else:
+                    vocab_freq[vocabs.index(vocab)] += 1
+
+        vocab_dict = {
+            'id': [0, 1, 2],
+            'vocab': ['<pad>', '<sos>', '<eos>'],
+            'freq': [0, 0, 0]
+        }
+
+        for idx, (freq, grapheme) in enumerate(sorted(zip(vocab_freq, vocabs), reverse=True), start=3):
+            vocab_dict['id'].append(idx)
+            vocab_dict['vocab'].append(grapheme)
+            vocab_dict['freq'].append(freq)
+
+        if vocab_type == KsponSpeechVocabType.CHARACTER:
+            vocab_dict['id'] = vocab_dict['id'][:2000]
+            vocab_dict['vocab'] = vocab_dict['vocab'][:2000]
+            vocab_dict['freq'] = vocab_dict['freq'][:2000]
+
+        vocab_df = pd.DataFrame(vocab_dict)
+        vocab_df.to_csv(vocab_path, encoding="utf-8", index=False)
+        return result
+
     def generate_grapheme(self, sentences: list, vocab_path: str) -> list:
         vocabs = list()
         vocab_freq = list()
