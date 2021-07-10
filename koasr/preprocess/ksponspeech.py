@@ -1,15 +1,12 @@
-from dataclasses import dataclass
 import os
 import re
 import unicodedata
-import pandas as pd
 from typing import Union
 
-import ray
-
-from joblib import Parallel, cpu_count, delayed
+import pandas as pd
 from tqdm import tqdm
-import time
+
+from koasr.preprocess.types import KsponSpeechVocabType, SpeechModeType
 
 PERCENT_FILES = {
     '087797': '퍼센트',
@@ -93,29 +90,17 @@ def sentence_filter(sentence, mode, replace):
     return special_filter(bracket_filter(sentence, mode), mode, replace)
 
 
-@dataclass
-class KsponSpeechModeType:
-    PHOENTIC: str = 'phonetic'
-    SPELLING: str = 'spelling'
-
-
-@dataclass
-class KsponSpeechVocabType:
-    CHARACTER: str = 'character'
-    SUBWORD: str = 'subword'
-    GRAPHEME: str = 'grapheme'
-
-
 class KsponSpeech:
     train_trn = ('train.trn',)
     eval_trn = ("eval_clean.trn", "eval_other.trn")
 
     def preprocess(
             self,
-            dataset_path: str,
             script_file_dir: str,
-            mode: str = KsponSpeechModeType.PHOENTIC,
-            unit: KsponSpeechVocabType = KsponSpeechVocabType.SUBWORD,
+            mode: str = SpeechModeType.PHOENTIC,
+            vocab_type: str = KsponSpeechVocabType.CHARACTER,
+            manifest_file_path: str = './manifest.csv',
+            vocab_path: str = './vocab.csv',
     ):
 
         train_audio_paths, train_transcripts = self.preprocess_sentence(script_file_dir, self.train_trn, mode)
@@ -123,22 +108,19 @@ class KsponSpeech:
 
         audio_paths = train_audio_paths + eval_audio_paths
         transcripts = train_transcripts + eval_transcripts
-
-        manifest_file_path: str = './mani.csv'
-        vocab_path: str = './vocab.csv'
         self.save_manifest(
             audio_paths,
             transcripts,
             manifest_file_path,
             vocab_path,
-            unit=KsponSpeechVocabType.CHARACTER
+            vocab_type=vocab_type
         )
 
     def preprocess_sentence(
             self,
             script_file_dir: str,
             script_file_name: Union[str, tuple, list],
-            mode: str = 'phonetic'
+            mode: str = SpeechModeType.PHOENTIC
     ):
         script_names = [script_file_name] if isinstance(script_file_name, str) else script_file_name
 
@@ -163,12 +145,12 @@ class KsponSpeech:
             transcripts: list,
             manifest_file_path: str,
             vocab_path: str,
-            unit=KsponSpeechVocabType.CHARACTER
+            vocab_type: str = KsponSpeechVocabType.CHARACTER
     ):
         vocabs = []
-        if unit == KsponSpeechVocabType.GRAPHEME:
+        if vocab_type == KsponSpeechVocabType.GRAPHEME:
             vocabs = self.generate_grapheme(transcripts, vocab_path)
-        elif unit == KsponSpeechVocabType.CHARACTER:
+        elif vocab_type == KsponSpeechVocabType.CHARACTER:
             vocabs = self.generate_character(transcripts, vocab_path)
 
         vocab2id, id2vocab = self.get_label(vocab_path)
@@ -181,7 +163,7 @@ class KsponSpeech:
             self,
             sentences: list,
             vocab_path: str,
-            vocab_type=KsponSpeechVocabType.GRAPHEME
+            vocab_type: str = KsponSpeechVocabType.GRAPHEME
     ) -> list:
         vocabs = list()
         vocab_freq = list()
