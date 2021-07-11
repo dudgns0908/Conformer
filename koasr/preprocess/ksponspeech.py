@@ -214,27 +214,27 @@ class KsponSpeech:
     #                 vocab_freq.append(1)
     #             else:
     #                 vocab_freq[vocabs.index(grapheme)] += 1
-    #
+    # 
     #     vocab_dict = {
     #         'id': [0, 1, 2],
     #         'vocab': ['<pad>', '<sos>', '<eos>'],
     #         'freq': [0, 0, 0]
     #     }
-    #
+    # 
     #     # vocab_freq, vocab_list = zip(*sorted(zip(vocab_freq, vocabs), reverse=True))
     #     for idx, (freq, grapheme) in enumerate(sorted(zip(vocab_freq, vocabs), reverse=True), start=3):
     #         vocab_dict['id'].append(idx)
     #         vocab_dict['vocab'].append(grapheme)
     #         vocab_dict['freq'].append(freq)
-    #
+    # 
     #     vocab_df = pd.DataFrame(vocab_dict)
     #     vocab_df.to_csv(vocab_path, encoding="utf-8", index=False)
     #     return graphemes
-    #
+    # 
     # def generate_character(self, sentences: list, vocab_path: str) -> list:
     #     vocabs = list()
     #     vocab_freq = list()
-    #
+    # 
     #     for sentence in sentences:
     #         for ch in sentence:
     #             if ch not in vocabs:
@@ -242,7 +242,7 @@ class KsponSpeech:
     #                 vocab_freq.append(1)
     #             else:
     #                 vocab_freq[vocabs.index(ch)] += 1
-    #
+    # 
     #     # sort together Using zip
     #     label_freq, label_list = zip(*sorted(zip(vocab_freq, vocabs), reverse=True))
     #     label = {
@@ -250,16 +250,16 @@ class KsponSpeech:
     #         'vocab': ['<pad>', '<sos>', '<eos>', '<blank>'],
     #         'freq': [0, 0, 0, 0]
     #     }
-    #
+    # 
     #     for idx, (ch, freq) in enumerate(zip(label_list, label_freq)):
     #         label['id'].append(idx + 4)
     #         label['vocab'].append(ch)
     #         label['freq'].append(freq)
-    #
+    # 
     #     label['id'] = label['id'][:2000]
     #     label['vocab'] = label['vocab'][:2000]
     #     label['freq'] = label['freq'][:2000]
-    #
+    # 
     #     label_df = pd.DataFrame(label)
     #     label_df.to_csv(vocab_path, encoding="utf-8", index=False)
     #     return sentences
