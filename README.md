@@ -39,7 +39,7 @@ description
 ### Train
 
 ```python
-from koasr.trainer import Trainer
+from conformer.trainer import Trainer
 
 Trainer().fit(...)
 ```
@@ -47,7 +47,7 @@ Trainer().fit(...)
 ### Evaluation
 
 ```python
-from koasr.predictor import Predictor
+from conformer.predictor import Predictor
 
 Predictor(model_path='path/to/').eval(...)
 ```

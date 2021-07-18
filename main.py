@@ -11,10 +11,10 @@ from omegaconf import DictConfig, OmegaConf
 # @dataclass
 # class TestConfig:
 #     phase: str = 'train'
-from koasr.configs.data import DataConfig
-from koasr.configs.model import ConformerLargeConfig
-from koasr.configs.train import TrainConfig
-from koasr.trainer import Trainer
+from conformer.configs.data import DataConfig
+from conformer.configs.model import ConformerLargeConfig
+from conformer.configs.train import TrainConfig
+from conformer.trainer import Trainer
 
 log = logging.getLogger(__name__)
 
