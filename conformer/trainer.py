@@ -5,18 +5,15 @@ from torch import Tensor
 
 from conformer.data.dataset import AudioDataset
 from conformer.models.model import Conformer
-from conformer.utils.model_info import model_dict
 
 
 class Trainer:
     def __init__(
             self,
             dataset_dir: str,
-            model_name: str,
             model_params: dict,
             resume: bool = False,
     ):
-        assert model_name.lower() in model_dict.keys(), f'This is Not supported model name ({model_name})'
 
         self.dataset_dir = dataset_dir
         # self.transcript_path = transcript_path
@@ -36,6 +33,6 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    model_name = 'Conformer'
-    trainer = Trainer(None, model_name, {'vocab_size': 80})
+    # model_name = 'Conformer'
+    trainer = Trainer(None, {'vocab_size': 80})
     trainer.fit()
