@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from omegaconf import DictConfig
 from torch import Tensor
+import pytorch_lightning as pl
 
 from conformer.data.dataset import AudioDataset
 from conformer.models.model import Conformer

@@ -1,14 +1,18 @@
 __all__ = ['Conformer']
 
+from typing import Optional
+
+import pytorch_lightning as pl
 import torch
-from torch import nn, Tensor
+from pytorch_lightning.utilities.types import STEP_OUTPUT, EVAL_DATALOADERS
+from torch import Tensor
 from torch.optim import Adam
 
 from conformer.models.decoder import ConformerDecoder
 from conformer.models.encoder import ConformerEncoder
 
 
-class Conformer(nn.Module):
+class Conformer(pl.LightningModule):
     """ Conformer Model """
 
     def __init__(
@@ -57,8 +61,22 @@ class Conformer(nn.Module):
         output = self.decoder(encoder_output)
         return output
 
-    def fit(self, inputs: Tensor, labels: Tensor) -> None:
+    def training_step(self, batch, batch_idx, *args, **kwargs) -> STEP_OUTPUT:
+        loss = torch.nn.CTCLoss()
+
+    def validation_step(self, *args, **kwargs) -> Optional[STEP_OUTPUT]:
+        pass
+
+    def test_step(self, *args, **kwargs) -> Optional[STEP_OUTPUT]:
+        pass
+
+    def configure_optimizers(self):
         lr = 0.05 / (self.encoder_dim ** 0.5)
         optimizer = Adam(self.encoder.parameters(), lr=lr, betas=(0.9, 0.98), eps=1e-10)
+        return optimizer
+
+    def val_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
 
 
